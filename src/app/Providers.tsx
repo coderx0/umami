@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider, ZenProvider } from '@umami/react-zen';
 import { NextIntlClientProvider } from 'next-intl';
 import { useEffect } from 'react';
+import { AgentOm } from '@/agent-om/AgentOm';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useLocale } from '@/components/hooks';
 import 'chartjs-adapter-date-fns';
@@ -38,7 +39,9 @@ export function Providers({ children }) {
       <RouterProvider>
         <MessagesProvider>
           <QueryClientProvider client={client}>
-            <ErrorBoundary>{children}</ErrorBoundary>
+            <AgentOm>
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </AgentOm>
           </QueryClientProvider>
         </MessagesProvider>
       </RouterProvider>

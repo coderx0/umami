@@ -57,3 +57,9 @@ yarn-error.log*
 
 # api integration test runtime state
 /tests/api/.runtime
+
+# Agent Object Model packages, packed from ../agent-om (scripts/agent-om-pack.sh)
+/vendor/agent-om
+
+# agent-om chat transcripts (src/agent-om/transcript.ts)
+/transcripts

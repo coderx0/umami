@@ -1,5 +1,5 @@
 import { Icon, ListItem, Row, Select, type SelectProps, Text } from '@umami/react-zen';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Empty } from '@/components/common/Empty';
 import {
   useLoginQuery,
@@ -34,6 +34,7 @@ export function WebsiteSelect({
     { search, pageSize: 100, includeTeams },
   );
   const listItems: { id: string; name: string }[] = data?.data || [];
+  const choicesId = useId();
 
   useEffect(() => {
     setName(website?.name);
@@ -72,45 +73,53 @@ export function WebsiteSelect({
   };
 
   return (
-    <Select
-      {...props}
-      value={websiteId ?? null}
-      isLoading={isLoading}
-      allowSearch={true}
-      onSearch={handleSearch}
-      onChange={value => handleChange(value as string)}
-      onOpenChange={handleOpenChange}
-      renderValue={renderValue}
-      buttonProps={{
-        ...buttonProps,
-        className: [
-          'border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-interactive active:bg-interactive-hover',
-          buttonProps?.className,
-        ]
-          .filter(Boolean)
-          .join(' '),
-        style: {
-          gap: 0,
-          justifyContent: isCollapsed ? 'start' : undefined,
-          ...buttonProps?.style,
-        },
-      }}
-      maxHeight={480}
-      listProps={{
-        ...listProps,
-        renderEmptyState:
-          listProps?.renderEmptyState || (() => <Empty message={t(messages.noResultsFound)} />),
-        style: {
-          width: 280,
-          ...listProps?.style,
-        },
-      }}
-    >
-      {listItems.map(({ id, name }) => (
-        <ListItem key={id} id={id}>
-          {name}
-        </ListItem>
-      ))}
-    </Select>
+    <>
+      <Select
+        {...props}
+        value={websiteId ?? null}
+        isLoading={isLoading}
+        allowSearch={true}
+        onSearch={handleSearch}
+        onChange={value => handleChange(value as string)}
+        onOpenChange={handleOpenChange}
+        renderValue={renderValue}
+        buttonProps={{
+          ...buttonProps,
+          'aria-label': props['aria-label'] ?? t(labels.website),
+          'aria-describedby': choicesId,
+          className: [
+            'border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-interactive active:bg-interactive-hover',
+            buttonProps?.className,
+          ]
+            .filter(Boolean)
+            .join(' '),
+          style: {
+            gap: 0,
+            justifyContent: isCollapsed ? 'start' : undefined,
+            ...buttonProps?.style,
+          },
+        }}
+        maxHeight={480}
+        listProps={{
+          ...listProps,
+          renderEmptyState:
+            listProps?.renderEmptyState || (() => <Empty message={t(messages.noResultsFound)} />),
+          style: {
+            width: 280,
+            ...listProps?.style,
+          },
+        }}
+      >
+        {listItems.map(({ id, name }) => (
+          <ListItem key={id} id={id}>
+            {name}
+          </ListItem>
+        ))}
+      </Select>
+      {/* the websites it offers, and what its search matches (named before it opens) */}
+      <span id={choicesId} hidden>
+        {`${t(labels.choices)}${data?.count > listItems.length ? ` (${t(messages.shownOfTotal, { shown: listItems.length, total: data.count })})` : ''}: ${listItems.map(({ name }) => name).join(', ')}. ${t(messages.websiteSearchRule)}`}
+      </span>
+    </>
   );
 }

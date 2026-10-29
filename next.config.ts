@@ -221,8 +221,12 @@ export default withNextIntl({
     defaultLocale,
     selfTrack,
     selfRecord,
+    // The agent-om chat's Anthropic key reaches the browser in dev mode only.
+    agentOmAnthropicKey: isProd ? '' : process.env.ANTHROPIC_API_KEY || '',
   },
   basePath,
+  // The Agent Object Model's agent and actions ship TypeScript source.
+  transpilePackages: ['@agent-om/actions', '@agent-om/agent'],
   output: isVercel ? undefined : 'standalone',
   typescript: {
     ignoreBuildErrors: true,

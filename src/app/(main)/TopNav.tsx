@@ -8,6 +8,9 @@ import { PixelSelect } from '@/components/input/PixelSelect';
 import { TeamsButton } from '@/components/input/TeamsButton';
 import { WebsiteSelect } from '@/components/input/WebsiteSelect';
 
+/** A data-agentom-id for react-zen props whose types don't list data- attributes. */
+const agentomId = (id: string) => ({ 'data-agentom-id': id }) as Record<string, string>;
+
 export function TopNav() {
   const { websiteId, linkId, pixelId, boardId, teamId, router, renderUrl } = useNavigation();
 
@@ -61,6 +64,7 @@ export function TopNav() {
                 teamId={teamId}
                 onChange={handleWebsiteChange}
                 buttonProps={{
+                  ...agentomId('nav.website'),
                   style: { minWidth: 200, maxWidth: 200 },
                 }}
               />
@@ -71,6 +75,7 @@ export function TopNav() {
                 teamId={teamId}
                 onChange={handleLinkChange}
                 buttonProps={{
+                  ...agentomId('nav.link'),
                   className:
                     'border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-interactive active:bg-interactive-hover',
                   style: { minHeight: 40, minWidth: 200, maxWidth: 200 },
@@ -83,6 +88,7 @@ export function TopNav() {
                 teamId={teamId}
                 onChange={handlePixelChange}
                 buttonProps={{
+                  ...agentomId('nav.pixel'),
                   className:
                     'border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-interactive active:bg-interactive-hover',
                   style: { minHeight: 40, minWidth: 200, maxWidth: 200 },
@@ -95,6 +101,7 @@ export function TopNav() {
                 teamId={teamId}
                 onChange={handleBoardChange}
                 buttonProps={{
+                  ...agentomId('nav.board'),
                   className:
                     'border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-interactive active:bg-interactive-hover',
                   style: { minHeight: 40, minWidth: 200, maxWidth: 200 },

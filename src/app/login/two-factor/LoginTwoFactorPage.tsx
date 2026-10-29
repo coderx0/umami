@@ -98,7 +98,9 @@ export function LoginTwoFactorPage() {
         <Text>{t(messages.twoFactorLoginDescription)}</Text>
 
         {!!lockUntil && lockMessage && (
-          <Text style={{ color: 'var(--zen-status-error)' }}>{lockMessage}</Text>
+          <Text role="alert" style={{ color: 'var(--zen-status-error)' }}>
+            {lockMessage}
+          </Text>
         )}
 
         <Form
@@ -106,6 +108,8 @@ export function LoginTwoFactorPage() {
           error={error ?? undefined}
           defaultValues={{ backupCode: '' }}
           style={{ minWidth: 300 }}
+          aria-label={t(labels.twoFactorLogin)}
+          data-agentom-id="two-factor"
         >
           {!useBackup ? (
             <Column gap="2">
@@ -122,7 +126,8 @@ export function LoginTwoFactorPage() {
             </Column>
           ) : (
             <FormField label={t(labels.twoFactorBackupCode)} name="backupCode">
-              <TextField autoComplete="off" />
+              {/* a secret: never projected (the digits above are, by their one-time-code autocomplete) */}
+              <TextField autoComplete="off" data-agentom-redact="" />
             </FormField>
           )}
 
@@ -139,8 +144,12 @@ export function LoginTwoFactorPage() {
           </FormButtons>
         </Form>
 
-        <Button variant="quiet" onPress={() => setUseBackup(v => !v)}>
-          {useBackup ? t(labels.twoFactorLogin) : t(labels.twoFactorUseBackup)}
+        <Button
+          variant="quiet"
+          onPress={() => setUseBackup(v => !v)}
+          data-agentom-id="two-factor.switch-method"
+        >
+          {useBackup ? t(labels.twoFactorUseAppCode) : t(labels.twoFactorUseBackup)}
         </Button>
       </Column>
     </Column>

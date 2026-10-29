@@ -47,6 +47,8 @@ export function LoginForm() {
         error={getErrorMessage(error)}
         defaultValues={{ username: '', password: '' }}
         style={{ minWidth: 300 }}
+        aria-label={t(labels.login)}
+        data-agentom-id="login"
       >
         <FormField
           label={t(labels.username)}
@@ -54,7 +56,7 @@ export function LoginForm() {
           name="username"
           rules={{ required: t(labels.required) }}
         >
-          <TextField autoComplete="username" />
+          <TextField autoComplete="username" aria-required data-agentom-id="login.username" />
         </FormField>
 
         <FormField
@@ -63,10 +65,15 @@ export function LoginForm() {
           name="password"
           rules={{ required: t(labels.required) }}
         >
-          <PasswordField autoComplete="current-password" />
+          <PasswordField
+            autoComplete="current-password"
+            aria-required
+            data-agentom-id="login.password"
+          />
         </FormField>
         <FormButtons>
           <FormSubmitButton
+            data-agentom-id="login.submit"
             data-test="button-submit"
             variant="primary"
             style={{ flex: 1 }}

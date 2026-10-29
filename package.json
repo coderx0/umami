@@ -72,6 +72,10 @@
     ".next/cache"
   ],
   "dependencies": {
+    "@agent-om/actions": "file:vendor/agent-om/agent-om-actions-0.0.0.tgz",
+    "@agent-om/agent": "file:vendor/agent-om/agent-om-agent-0.0.0.tgz",
+    "@agent-om/core": "file:vendor/agent-om/agent-om-core-0.0.0.tgz",
+    "@agent-om/react": "file:vendor/agent-om/agent-om-react-0.0.0.tgz",
     "@clickhouse/client": "^1.23.1",
     "@dicebear/collection": "^9.4.3",
     "@dicebear/core": "^9.4.3",

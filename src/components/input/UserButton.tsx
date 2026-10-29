@@ -15,6 +15,7 @@ import {
   useTheme,
 } from '@umami/react-zen';
 import { useRouter } from 'next/navigation';
+import { useId } from 'react';
 import { useConfig, useLocale, useLoginQuery, useMessages, useMobile } from '@/components/hooks';
 import {
   BookText,
@@ -45,6 +46,7 @@ export function UserButton({ showText = true, onClose }: UserButtonProps) {
   const { theme, setTheme } = useTheme();
   const { isMobile } = useMobile();
   const router = useRouter();
+  const choicesId = useId();
 
   const getUrl = (url: string) => {
     return cloudMode ? `${process.env.cloudUrl}${url}` : url;
@@ -111,10 +113,20 @@ export function UserButton({ showText = true, onClose }: UserButtonProps) {
     },
   ].filter(Boolean);
 
+  // What the menu offers, from the same items it renders (named before it opens).
+  const choices = [
+    t(labels.settings),
+    t(labels.language),
+    t(labels.theme),
+    ...items.filter((item: any) => !item.separator).map((item: any) => item.label),
+  ];
+
   const trigger = (
     <Button
       variant="zero"
-      aria-label={showText ? undefined : user.username}
+      aria-label={`${user.username}, ${t(labels.userMenu)}`}
+      aria-describedby={choicesId}
+      data-agentom-id="nav.user-menu"
       style={{
         display: 'flex',
         padding: 0,
@@ -238,13 +250,27 @@ export function UserButton({ showText = true, onClose }: UserButtonProps) {
     </MenuTrigger>
   );
 
+  const described = (
+    <span id={choicesId} hidden>
+      {`${t(labels.choices)}: ${choices.join(', ')}`}
+    </span>
+  );
+
   if (showText) {
-    return <div style={{ width: '100%' }}>{menu}</div>;
+    return (
+      <div style={{ width: '100%' }}>
+        {menu}
+        {described}
+      </div>
+    );
   }
 
   return (
     <TooltipTrigger delay={0}>
-      <div style={{ width: '100%' }}>{menu}</div>
+      <div style={{ width: '100%' }}>
+        {menu}
+        {described}
+      </div>
       <Tooltip placement="right">{user.username}</Tooltip>
     </TooltipTrigger>
   );

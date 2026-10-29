@@ -20,6 +20,8 @@ vi.mock('@/components/hooks', () => ({
       settings: 'Settings',
       support: 'Support',
       theme: 'Theme',
+      choices: 'Choices',
+      userMenu: 'user menu',
     },
   }),
   useMobile: () => ({ isMobile: false }),
@@ -27,7 +29,7 @@ vi.mock('@/components/hooks', () => ({
 
 test('renders the expanded sidebar control at full width and opens its menu', async () => {
   const { user } = render(<UserButton />);
-  const button = screen.getByRole('button', { name: 'admin' });
+  const button = screen.getByRole('button', { name: 'admin, user menu' });
 
   expect(button).toHaveStyle({ width: '100%' });
 
@@ -39,7 +41,7 @@ test('renders the expanded sidebar control at full width and opens its menu', as
 
 test('keeps the collapsed sidebar control accessible and interactive', async () => {
   const { user } = render(<UserButton showText={false} />);
-  const button = screen.getByRole('button', { name: 'admin' });
+  const button = screen.getByRole('button', { name: 'admin, user menu' });
 
   button.focus();
   await user.keyboard('{Enter}');
@@ -49,7 +51,7 @@ test('keeps the collapsed sidebar control accessible and interactive', async () 
 
 test('closes the menu after selecting settings', async () => {
   const { user } = render(<UserButton />);
-  const button = screen.getByRole('button', { name: 'admin' });
+  const button = screen.getByRole('button', { name: 'admin, user menu' });
 
   button.focus();
   await user.keyboard('{Enter}');

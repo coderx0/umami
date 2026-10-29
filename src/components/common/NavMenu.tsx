@@ -1,6 +1,8 @@
 import { Column, Heading, Row, Text } from '@umami/react-zen';
 import { IconLabel } from '@/components/common/IconLabel';
 import Link from '@/components/common/Link';
+import { useNavigation } from '@/components/hooks';
+import { ariaCurrent } from '@/lib/aria';
 
 interface NavMenuData {
   id: string;
@@ -30,12 +32,18 @@ export function NavMenu({
   onItemClick,
   ...props
 }: NavMenuProps) {
+  const { pathname } = useNavigation();
   const renderItems = (items: NavMenuData[]) => {
     return items?.map(({ id, label, icon, path }) => {
       const isSelected = selectedKey === id;
 
       return (
-        <Link key={id} href={path} onClick={onItemClick}>
+        <Link
+          key={id}
+          href={path}
+          aria-current={ariaCurrent(pathname, path, isSelected)}
+          onClick={onItemClick}
+        >
           <Row
             padding
             borderRadius
@@ -62,7 +70,13 @@ export function NavMenu({
         {items?.map(({ label, items }, index) => {
           if (label) {
             return (
-              <Column key={`${label}${index}`} gap="1" minHeight="40px">
+              <Column
+                key={`${label}${index}`}
+                gap="1"
+                minHeight="40px"
+                role="group"
+                aria-label={label}
+              >
                 <Row paddingX="3" marginTop="2">
                   <Text weight="bold">{label}</Text>
                 </Row>

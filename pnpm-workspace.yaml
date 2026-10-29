@@ -17,6 +17,9 @@ minimumReleaseAgeExclude:
 
 # Security floors for transitive dependencies whose parents still allow affected versions.
 overrides:
+  # The Agent Object Model packages depend on each other: every copy is the packed tarball.
+  '@agent-om/actions': file:vendor/agent-om/agent-om-actions-0.0.0.tgz
+  '@agent-om/core': file:vendor/agent-om/agent-om-core-0.0.0.tgz
   '@babel/core@<7.29.6': 7.29.6
   'brace-expansion@<1.1.21': 1.1.21
   'brace-expansion@>=2.0.0 <2.1.7': 2.1.7

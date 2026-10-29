@@ -26,6 +26,7 @@ import {
 } from '@/components/icons';
 import { UserButton } from '@/components/input/UserButton';
 import { Logo } from '@/components/svg';
+import { ariaCurrent } from '@/lib/aria';
 
 export function SideNav(props: any) {
   const { t, labels } = useMessages();
@@ -109,49 +110,56 @@ export function SideNav(props: any) {
         className={isCollapsed ? styles.collapsed : undefined}
         style={{ flexGrow: 1, minHeight: 0 }}
       >
-        {websiteId ? (
-          <WebsiteNav websiteId={websiteId} isCollapsed={isCollapsed} />
-        ) : pathname.includes('/settings') ? (
-          <SettingsNav isCollapsed={isCollapsed} />
-        ) : pathname.includes('/admin') ? (
-          <AdminNav />
-        ) : (
-          <Column gap="2">
-            {links.map(({ id, path, label, icon }) => {
-              const isSelected = pathname.startsWith(renderUrl(path, false));
-              const content = (
-                <Row
-                  tabIndex={0}
-                  alignItems="center"
-                  justifyContent={isCollapsed ? 'center' : undefined}
-                  hover={{ backgroundColor: 'surface-sunken' }}
-                  backgroundColor={isSelected ? 'surface-sunken' : undefined}
-                  borderRadius
-                  minHeight="9"
-                >
-                  <IconLabel
-                    icon={icon}
-                    label={isCollapsed ? '' : label}
-                    weight={isSelected ? 'bold' : undefined}
-                    padding
-                  />
-                </Row>
-              );
-              return (
-                <Link key={id} href={renderUrl(path, false)} role="button">
-                  {isCollapsed ? (
-                    <TooltipTrigger delay={0}>
-                      {content}
-                      <Tooltip placement="right">{label}</Tooltip>
-                    </TooltipTrigger>
-                  ) : (
-                    content
-                  )}
-                </Link>
-              );
-            })}
-          </Column>
-        )}
+        <nav aria-label={t(labels.navigation)} data-agentom-id="nav">
+          {websiteId ? (
+            <WebsiteNav websiteId={websiteId} isCollapsed={isCollapsed} />
+          ) : pathname.includes('/settings') ? (
+            <SettingsNav isCollapsed={isCollapsed} />
+          ) : pathname.includes('/admin') ? (
+            <AdminNav />
+          ) : (
+            <Column gap="2">
+              {links.map(({ id, path, label, icon }) => {
+                const isSelected = pathname.startsWith(renderUrl(path, false));
+                const content = (
+                  <Row
+                    tabIndex={0}
+                    alignItems="center"
+                    justifyContent={isCollapsed ? 'center' : undefined}
+                    hover={{ backgroundColor: 'surface-sunken' }}
+                    backgroundColor={isSelected ? 'surface-sunken' : undefined}
+                    borderRadius
+                    minHeight="9"
+                  >
+                    <IconLabel
+                      icon={icon}
+                      label={isCollapsed ? '' : label}
+                      weight={isSelected ? 'bold' : undefined}
+                      padding
+                    />
+                  </Row>
+                );
+                return (
+                  <Link
+                    key={id}
+                    href={renderUrl(path, false)}
+                    aria-label={label}
+                    aria-current={ariaCurrent(pathname, renderUrl(path, false), isSelected)}
+                  >
+                    {isCollapsed ? (
+                      <TooltipTrigger delay={0}>
+                        {content}
+                        <Tooltip placement="right">{label}</Tooltip>
+                      </TooltipTrigger>
+                    ) : (
+                      content
+                    )}
+                  </Link>
+                );
+              })}
+            </Column>
+          )}
+        </nav>
       </OverlayScrollArea>
       <Row
         paddingTop="2"
@@ -166,11 +174,14 @@ export function SideNav(props: any) {
 }
 
 const PanelButton = (props: ButtonProps) => {
+  const { t, labels } = useMessages();
   const [isCollapsed, setIsCollapsed] = useGlobalState('sidenav-collapsed', false);
   return (
     <Button
       onPress={() => setIsCollapsed(!isCollapsed)}
       variant="zero"
+      aria-label={t(isCollapsed ? labels.expandSidebar : labels.collapseSidebar)}
+      data-agentom-id="nav.sidebar-toggle"
       {...props}
       style={{ padding: 0 }}
     >

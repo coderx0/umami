@@ -3,6 +3,7 @@ import { IconLabel } from '@/components/common/IconLabel';
 import Link from '@/components/common/Link';
 import { useMessages, useNavigation } from '@/components/hooks';
 import { ArrowLeft, KeyRound, Settings2, ShieldCheck, UserCircle, Users } from '@/components/icons';
+import { ariaCurrent } from '@/lib/aria';
 
 export function SettingsNav({
   isCollapsed,
@@ -58,7 +59,11 @@ export function SettingsNav({
 
   return (
     <Column gap="2">
-      <Link href={renderUrl('/websites', false)} role="button" onClick={onItemClick}>
+      <Link
+        href={renderUrl('/websites', false)}
+        aria-label={t(labels.backToWebsites)}
+        onClick={onItemClick}
+      >
         {(() => {
           const content = (
             <Row
@@ -84,7 +89,13 @@ export function SettingsNav({
         })()}
       </Link>
       {items.map(({ label: sectionLabel, items: sectionItems }, index) => (
-        <Column key={`${sectionLabel}${index}`} gap="1" marginBottom="1">
+        <Column
+          key={`${sectionLabel}${index}`}
+          gap="1"
+          marginBottom="1"
+          role="group"
+          aria-label={sectionLabel}
+        >
           {!isCollapsed && (
             <Row paddingX="3" marginTop="2">
               <Text weight="bold">{sectionLabel}</Text>
@@ -111,7 +122,13 @@ export function SettingsNav({
               </Row>
             );
             return (
-              <Link key={id} href={path} role="button" onClick={onItemClick}>
+              <Link
+                key={id}
+                href={path}
+                aria-label={label}
+                aria-current={ariaCurrent(pathname, path, isSelected)}
+                onClick={onItemClick}
+              >
                 {isCollapsed ? (
                   <TooltipTrigger delay={0}>
                     {content}
