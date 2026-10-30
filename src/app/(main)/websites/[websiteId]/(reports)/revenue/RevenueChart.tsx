@@ -1,6 +1,7 @@
 import { colord } from 'colord';
 import { useCallback, useMemo } from 'react';
 import { BarChart } from '@/components/charts/BarChart';
+import { ChartDataTable } from '@/components/charts/ChartDataTable';
 import { useLocale, useMessages } from '@/components/hooks';
 import { renderDateLabels } from '@/lib/charts';
 import { CHART_COLORS } from '@/lib/constants';
@@ -126,17 +127,27 @@ export function RevenueChart({
 
   const renderXLabel = useCallback(renderDateLabels(unit, locale), [unit, locale]);
 
+  // the drawing is visual only; its figures are in the table beside it (guidelines 3.4)
   return (
-    <BarChart
-      chartData={chartData}
-      unit={unit}
-      minDate={minDate}
-      maxDate={maxDate}
-      currency={currency}
-      stacked={!isCumulative}
-      renderXLabel={renderXLabel}
-      height="400px"
-    />
+    <>
+      <ChartDataTable
+        caption={t(labels.revenueOverTime)}
+        datasets={chartData?.datasets}
+        unit={unit}
+      />
+      <div data-agentom-ignore="" aria-hidden="true">
+        <BarChart
+          chartData={chartData}
+          unit={unit}
+          minDate={minDate}
+          maxDate={maxDate}
+          currency={currency}
+          stacked={!isCumulative}
+          renderXLabel={renderXLabel}
+          height="400px"
+        />
+      </div>
+    </>
   );
 }
 

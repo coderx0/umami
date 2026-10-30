@@ -17,6 +17,7 @@ import {
 } from '@umami/react-zen';
 import { endOfDay, subMonths } from 'date-fns';
 import type { Key } from 'react';
+import { useId } from 'react';
 import { Empty } from '@/components/common/Empty';
 import { FilterRecord } from '@/components/common/FilterRecord';
 import { type FieldGroup, useFields, useMessages, useMobile } from '@/components/hooks';
@@ -40,6 +41,7 @@ export function FieldFilters({
   onMatchChange,
 }: FieldFiltersProps) {
   const { t, labels, messages } = useMessages();
+  const matchChoicesId = useId();
   const { fields, groupLabels } = useFields();
   const startDate = subMonths(endOfDay(new Date()), 6);
   const endDate = endOfDay(new Date());
@@ -115,7 +117,7 @@ export function FieldFilters({
         paddingRight="3"
         marginRight="6"
       >
-        <List>
+        <List aria-label={t(labels.fields)}>
           {groupLabels.map(({ key: groupKey, label }) => {
             const groupFields = groupedFields[groupKey];
             if (!groupFields || groupFields.length === 0) return null;
@@ -143,10 +145,17 @@ export function FieldFilters({
           <Row alignItems="center" gap>
             <Column gap="1">
               <Label>{t(labels.match)}</Label>
+              <span id={matchChoicesId} hidden>
+                {`${t(labels.choices)}: ${t(labels.matchAll)}, ${t(labels.matchAny)}`}
+              </span>
               <Select
                 value={match}
                 onChange={value => onMatchChange(value as string)}
-                buttonProps={{ style: { width: 150 } }}
+                buttonProps={{
+                  style: { width: 150 },
+                  'aria-label': t(labels.match),
+                  'aria-describedby': matchChoicesId,
+                }}
               >
                 <ListItem id="all">{t(labels.matchAll)}</ListItem>
                 <ListItem id="any">{t(labels.matchAny)}</ListItem>

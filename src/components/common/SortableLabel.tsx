@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@umami/react-zen';
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { useNavigation } from '@/components/hooks';
 import { ChevronDown, ChevronUp } from '@/components/icons';
 
@@ -28,6 +28,17 @@ export function SortableLabel({ label, sortKey, defaultDirection = 'asc' }: Sort
     return direction === 'desc' ? 'asc' : 'desc';
   };
 
+  // The sort is the column header's state (guidelines 1.7): aria-sort goes on the
+  // header cell the table renders around this button, not on the button.
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const header = ref.current?.closest('[role="columnheader"], th');
+    if (!header) return;
+    if (direction)
+      header.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
+    else header.removeAttribute('aria-sort');
+  }, [direction]);
+
   const handleSort = () => {
     const nextDirection = getNextDirection();
 
@@ -44,8 +55,8 @@ export function SortableLabel({ label, sortKey, defaultDirection = 'asc' }: Sort
     <button
       type="button"
       onClick={handleSort}
+      ref={ref}
       className="inline-flex appearance-none items-center gap-1 border-0 bg-transparent p-0 text-inherit"
-      aria-pressed={isActive}
     >
       <span>{label}</span>
       <span

@@ -1,4 +1,5 @@
 import { Button, Column, Dialog, DialogTrigger, Modal } from '@umami/react-zen';
+import { useId } from 'react';
 import { ActionForm } from '@/components/common/ActionForm';
 import {
   useLoginQuery,
@@ -19,6 +20,9 @@ export function WebsiteData({ websiteId, onSave }: { websiteId: string; onSave?:
   const { router, pathname, teamId, renderUrl } = useNavigation();
   const { data: teams } = useUserTeamsQuery(user.id);
   const isAdmin = pathname.startsWith('/admin');
+  const transferHintId = useId();
+  const resetHintId = useId();
+  const deleteHintId = useId();
 
   const canTransferWebsite =
     (
@@ -46,12 +50,29 @@ export function WebsiteData({ websiteId, onSave }: { websiteId: string; onSave?:
     onSave?.();
   };
 
+  // what each opens and does, in the words shown beside it (guidelines 1.16)
   return (
     <Column gap="6">
+      <span id={transferHintId} hidden>
+        {t(messages.transferWebsite)}
+      </span>
+      <span id={resetHintId} hidden>
+        {t(messages.resetWebsiteWarning)}
+      </span>
+      <span id={deleteHintId} hidden>
+        {t(messages.deleteWebsiteWarning)}
+      </span>
       {!isAdmin && (
         <ActionForm label={t(labels.transferWebsite)} description={t(messages.transferWebsite)}>
           <DialogTrigger>
-            <Button isDisabled={!canTransferWebsite}>{t(labels.transfer)}</Button>
+            <Button
+              isDisabled={!canTransferWebsite}
+              aria-label={t(labels.transferWebsite)}
+              aria-describedby={transferHintId}
+              data-agentom-id="website.transfer"
+            >
+              {t(labels.transfer)}
+            </Button>
             <Modal>
               <Dialog title={t(labels.transferWebsite)} style={{ width: 400 }}>
                 {({ close }) => (
@@ -65,7 +86,13 @@ export function WebsiteData({ websiteId, onSave }: { websiteId: string; onSave?:
 
       <ActionForm label={t(labels.resetWebsite)} description={t(messages.resetWebsiteWarning)}>
         <DialogTrigger>
-          <Button>{t(labels.reset)}</Button>
+          <Button
+            aria-label={t(labels.resetWebsite)}
+            aria-describedby={resetHintId}
+            data-agentom-id="website.reset"
+          >
+            {t(labels.reset)}
+          </Button>
           <Modal>
             <Dialog title={t(labels.resetWebsite)} style={{ width: 400 }}>
               {({ close }) => (
@@ -78,7 +105,13 @@ export function WebsiteData({ websiteId, onSave }: { websiteId: string; onSave?:
 
       <ActionForm label={t(labels.deleteWebsite)} description={t(messages.deleteWebsiteWarning)}>
         <DialogTrigger>
-          <Button data-test="button-delete" variant="danger">
+          <Button
+            data-test="button-delete"
+            variant="danger"
+            aria-label={t(labels.deleteWebsite)}
+            aria-describedby={deleteHintId}
+            data-agentom-id="website.delete"
+          >
             {t(labels.delete)}
           </Button>
           <Modal>

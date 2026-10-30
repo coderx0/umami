@@ -17,7 +17,14 @@ declare global {
 }
 
 /** What the projector's context is made of; AgentOm.tsx keeps it current. */
-export const appContext: { screen?: string; loading?: boolean } = {};
+export const appContext: {
+  screen?: string;
+  loading?: boolean;
+  /** on a website's pages: which website (guidelines 5.5) */
+  website?: { id: string; name?: string };
+  /** on a website's pages: the dates its reports cover, resolved from the address's `date` */
+  dateRange?: { start: string; end: string; unit: string };
+} = {};
 
 /**
  * Screen name from the path and the route's params: a segment that is a
@@ -57,6 +64,8 @@ export function startProjection(): SemanticProjector {
     context: (): SemanticAppContext => ({
       screen: appContext.screen,
       state: appContext.loading ? 'loading' : 'ready',
+      ...(appContext.website ? { website: appContext.website } : {}),
+      ...(appContext.dateRange ? { dateRange: appContext.dateRange } : {}),
     }),
     location: () => locationWithoutSecrets(),
     onWarning: warning => {

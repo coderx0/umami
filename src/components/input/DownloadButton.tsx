@@ -19,7 +19,12 @@ export function DownloadButton({
 
   return (
     <TooltipTrigger delay={0}>
-      <Button variant="quiet" onClick={handleClick} isDisabled={!data || data.length === 0}>
+      <Button
+        variant="quiet"
+        onClick={handleClick}
+        isDisabled={!data || data.length === 0}
+        aria-label={t(labels.download)}
+      >
         <Icon>
           <Download />
         </Icon>

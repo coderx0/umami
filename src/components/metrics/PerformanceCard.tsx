@@ -1,6 +1,6 @@
 import { Column, Text } from '@umami/react-zen';
 import { useSpring, useTransform } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { AnimatedDiv } from '@/components/common/AnimatedDiv';
 import { Badge } from '@/components/common/Badge';
 import { useMessages } from '@/components/hooks';
@@ -40,6 +40,8 @@ export const PerformanceCard = ({
   selected = false,
 }: PerformanceCardProps) => {
   const { t, labels } = useMessages();
+  const valueId = useId();
+  const ratingId = useId();
   const rating = getRating(metric, value);
   const prevMetricRef = useRef(metric);
   const metricChanged = prevMetricRef.current !== metric;
@@ -54,8 +56,28 @@ export const PerformanceCard = ({
     else spring.set(target);
   }, [target, metricChanged, spring]);
 
+  // with onClick, a choice of metric: a radio named by it, described by its value and
+  // rating (guidelines 1.4)
+  const choice = onClick
+    ? {
+        role: 'radio',
+        'aria-checked': selected,
+        'aria-label': label,
+        'aria-describedby': `${valueId} ${ratingId}`,
+        'data-agentom-id': `performance.metric.${metric}`,
+        tabIndex: 0,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        },
+      }
+    : {};
+
   return (
     <Column
+      {...choice}
       className={`${styles.card} ${selected ? styles.selected : ''}`}
       justifyContent="center"
       paddingX="6"
@@ -70,10 +92,10 @@ export const PerformanceCard = ({
       <Text weight="bold" wrap="nowrap">
         {label}
       </Text>
-      <Text size="4xl" weight="bold" wrap="nowrap">
+      <Text size="4xl" weight="bold" wrap="nowrap" id={valueId}>
         <AnimatedDiv>{display}</AnimatedDiv>
       </Text>
-      <Badge variant={RATING_VARIANTS[rating]}>
+      <Badge variant={RATING_VARIANTS[rating]} id={ratingId}>
         {t(labels[rating === 'needs-improvement' ? 'needsImprovement' : rating])}
       </Badge>
     </Column>

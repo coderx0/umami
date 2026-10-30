@@ -1,5 +1,5 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useNavigation, useRevenueSessionsQuery } from '@/components/hooks';
+import { useMessages, useNavigation, useRevenueSessionsQuery } from '@/components/hooks';
 import { SessionsTable } from '../../sessions/SessionsTable';
 
 export interface RevenueSessionsDataTableProps {
@@ -8,11 +8,17 @@ export interface RevenueSessionsDataTableProps {
 }
 
 export function RevenueSessionsDataTable({ websiteId, currency }: RevenueSessionsDataTableProps) {
+  const { t, messages } = useMessages();
   const { updateParams } = useNavigation();
   const queryResult = useRevenueSessionsQuery(websiteId, currency);
 
   return (
-    <DataGrid query={queryResult} allowPaging allowSearch>
+    <DataGrid
+      query={queryResult}
+      allowPaging
+      allowSearch
+      searchDescription={t(messages.customersSearchRule)}
+    >
       {({ data }) => (
         <SessionsTable
           data={data}

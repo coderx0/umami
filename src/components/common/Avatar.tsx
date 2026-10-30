@@ -17,5 +17,6 @@ export function Avatar({ seed, size = 128, ...props }: { seed: string; size?: nu
     }).toDataUri();
   }, []);
 
-  return <img src={avatar} alt="Avatar" style={{ borderRadius: '100%', width: size }} />;
+  // generated from the session id: decorative (guidelines 1.6); the link around it is named
+  return <img src={avatar} alt="" style={{ borderRadius: '100%', width: size }} />;
 }

@@ -17,6 +17,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useState,
 } from 'react';
 import { Empty } from '@/components/common/Empty';
@@ -35,6 +36,8 @@ export interface DataGridProps {
   query: UseQueryResult<PageResult<any>, any>;
   searchDelay?: number;
   allowSearch?: boolean;
+  /** what the search matches and how (guidelines 1.15), written from the query that does the matching */
+  searchDescription?: string;
   allowPaging?: boolean;
   autoFocus?: boolean;
   renderActions?: () => ReactNode;
@@ -46,13 +49,16 @@ export function DataGrid({
   query,
   searchDelay = 600,
   allowSearch,
+  searchDescription,
   allowPaging = true,
   autoFocus,
   renderActions,
   renderEmpty = () => <Empty />,
   children,
 }: DataGridProps) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const searchHintId = useId();
+  const statusId = useId();
   const { data, error, isLoading, isFetching } = query;
   const { router, updateParams, query: queryParams } = useNavigation();
   const [search, setSearch] = useState(queryParams?.search || data?.search || '');
@@ -104,9 +110,40 @@ export function DataGrid({
 
   const child = data ? (typeof children === 'function' ? children(data) : children) : null;
 
+  // From the first keystroke until its rows arrive, the list is updating; then the
+  // status line says which slice is shown, and what narrows it (guidelines 1.14).
+  const isPending = search !== (queryParams?.search || '') || isFetching;
+  const shownSearch = queryParams?.search || '';
+  const status = isPending
+    ? t(labels.updating)
+    : data?.count > 0
+      ? [
+          t(messages.listStatus, {
+            start: ((+data.page - 1) * +data.pageSize + 1).toLocaleString(),
+            end: ((+data.page - 1) * +data.pageSize + data.data.length).toLocaleString(),
+            count: data.isCapped ? '10,000+' : (+data.count).toLocaleString(),
+          }),
+          shownSearch && t(messages.listStatusSearch, { search: shownSearch }),
+          +data.count > +data.pageSize &&
+            t(labels.pageOf, {
+              current: (+data.page).toLocaleString(),
+              total: Math.ceil(+data.count / +data.pageSize).toLocaleString(),
+            }),
+        ]
+          .filter(Boolean)
+          .join(', ')
+      : '';
+
   const viewToggleButton = (
     <TooltipTrigger delay={0}>
-      <Button variant="zero" onPress={handleToggleDisplayMode}>
+      <Button
+        variant="zero"
+        onPress={handleToggleDisplayMode}
+        aria-label={
+          displayMode === 'cards' ? t(labels.switchToTableView) : t(labels.switchToCardView)
+        }
+        data-agentom-id="list.view-toggle"
+      >
         <Icon>{displayMode === 'cards' ? <Table2 /> : <LayoutGrid />}</Icon>
       </Button>
       <Tooltip>
@@ -128,17 +165,28 @@ export function DataGrid({
             autoFocus={autoFocus}
             placeholder={t(labels.search)}
             className="w-full max-w-md"
+            aria-describedby={searchDescription ? searchHintId : undefined}
           />
+        )}
+        {allowSearch && searchDescription && (
+          <span id={searchHintId} hidden>
+            {searchDescription}
+          </span>
         )}
         <Row
           alignItems="center"
           gap
-          style={isMobile ? { width: '100%', justifyContent: 'flex-start' } : { marginLeft: 'auto' }}
+          style={
+            isMobile ? { width: '100%', justifyContent: 'flex-start' } : { marginLeft: 'auto' }
+          }
         >
           {renderActions?.()}
           {!isMobile && viewToggleButton}
         </Row>
       </Row>
+      <span role="status" id={statusId} className="sr-only">
+        {status}
+      </span>
       <LoadingPanel
         data={data?.data}
         isLoading={isLoading}
@@ -156,7 +204,11 @@ export function DataGrid({
           >
             <Column>
               {isValidElement(child)
-                ? cloneElement(child as ReactElement<any>, { displayMode })
+                ? cloneElement(child as ReactElement<any>, {
+                    displayMode,
+                    'aria-describedby': statusId,
+                    'aria-busy': isPending || undefined,
+                  })
                 : child}
             </Column>
           </div>

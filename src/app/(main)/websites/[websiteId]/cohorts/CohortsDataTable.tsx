@@ -1,9 +1,10 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useWebsiteCohortsQuery } from '@/components/hooks';
+import { useMessages, useWebsiteCohortsQuery } from '@/components/hooks';
 import { CohortAddButton } from './CohortAddButton';
 import { CohortsTable } from './CohortsTable';
 
 export function CohortsDataTable({ websiteId }: { websiteId?: string }) {
+  const { t, messages } = useMessages();
   const query = useWebsiteCohortsQuery(websiteId, { type: 'cohort' });
 
   const renderActions = () => {
@@ -14,6 +15,7 @@ export function CohortsDataTable({ websiteId }: { websiteId?: string }) {
     <DataGrid
       query={query}
       allowSearch={true}
+      searchDescription={t(messages.cohortsSearchRule)}
       autoFocus={false}
       allowPaging={true}
       renderActions={renderActions}

@@ -1,7 +1,8 @@
 import { Button, Column, Icon, Row, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
 import { useSpring, useTransform } from 'motion/react';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useId } from 'react';
 import { AnimatedDiv } from '@/components/common/AnimatedDiv';
+import { useMessages } from '@/components/hooks';
 import { Info } from '@/components/icons';
 import { ChangeLabel } from '@/components/metrics/ChangeLabel';
 import { formatNumber } from '@/lib/format';
@@ -45,6 +46,11 @@ export const MetricCard = ({
     pctSpring.set(p);
   }, [p, pctSpring]);
 
+  const { t, labels } = useMessages();
+  const tooltipId = useId();
+
+  // a group named by its label, so its figure is read as that metric (guidelines 1.12);
+  // what the tooltip explains is its description, not only shown on hover
   return (
     <Column
       justifyContent="center"
@@ -54,7 +60,15 @@ export const MetricCard = ({
       backgroundColor="surface"
       border
       gap="4"
+      role="group"
+      aria-label={label}
+      aria-describedby={tooltip ? tooltipId : undefined}
     >
+      {tooltip && (
+        <span id={tooltipId} hidden>
+          {tooltip}
+        </span>
+      )}
       {showLabel && (
         <Row justifyContent="space-between" alignItems="flex-start">
           <Text weight="bold" wrap="nowrap">
@@ -62,7 +76,12 @@ export const MetricCard = ({
           </Text>
           {tooltip && (
             <TooltipTrigger delay={0}>
-              <Button size="sm" variant="quiet">
+              <Button
+                size="sm"
+                variant="quiet"
+                aria-label={t(labels.aboutMetric, { label })}
+                aria-describedby={tooltipId}
+              >
                 <Icon size="sm">
                   <Info />
                 </Icon>

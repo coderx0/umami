@@ -21,7 +21,8 @@ export function TypeIcon({
         onError={e => {
           e.currentTarget.src = `${process.env.basePath || ''}/images/${type}/unknown.png`;
         }}
-        alt={value}
+        // decorative: every use shows the value's name beside it (guidelines 1.6)
+        alt=""
         width={type === 'country' ? undefined : 16}
         height={type === 'country' ? undefined : 16}
       />

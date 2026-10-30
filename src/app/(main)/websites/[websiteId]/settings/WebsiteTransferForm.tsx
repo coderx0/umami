@@ -90,9 +90,12 @@ export function WebsiteTransferForm({
             </FormField>
             <FormButtons>
               <Button onPress={onClose}>{t(labels.cancel)}</Button>
+              {/* it changes who owns the website (guidelines 4.3) */}
               <FormSubmitButton
                 variant="primary"
                 isLoading={isPending}
+                data-agentom-id="website.transfer.confirm"
+                data-agentom-risk="sensitive"
                 isDisabled={!isTeamWebsite && !selectedTeamId}
               >
                 {t(labels.transfer)}

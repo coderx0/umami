@@ -1,11 +1,12 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useNavigation, useReplaysQuery } from '@/components/hooks';
+import { useMessages, useNavigation, useReplaysQuery } from '@/components/hooks';
 import { ReplayFilterButton } from './ReplayFilterButton';
 import { ReplaysTable } from './ReplaysTable';
 
 const DEFAULT_MIN_DURATION = 5;
 
 export function ReplaysDataTable({ websiteId }: { websiteId: string }) {
+  const { t, messages } = useMessages();
   const { query } = useNavigation();
   const minDuration =
     typeof query.minDuration === 'string' && /^\d+$/.test(query.minDuration)
@@ -18,6 +19,7 @@ export function ReplaysDataTable({ websiteId }: { websiteId: string }) {
       query={queryResult}
       allowPaging
       allowSearch
+      searchDescription={t(messages.replaysSearchRule)}
       renderActions={() => <ReplayFilterButton />}
     >
       {({ data }) => {

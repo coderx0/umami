@@ -174,9 +174,12 @@ export function ShareEditForm({
                   {t(labels.cancel)}
                 </Button>
               )}
+              {/* it makes the website's stats public at the link (guidelines 4.3) */}
               <FormSubmitButton
                 variant="primary"
                 isDisabled={isPending || !hasSelection || !values.name}
+                data-agentom-id="share.save"
+                data-agentom-risk="sensitive"
               >
                 {t(labels.save)}
               </FormSubmitButton>

@@ -11,7 +11,7 @@ export function EventsDataTable({
   teamId?: string;
   children?: ReactNode;
 }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
   const [view, setView] = useState('all');
   const query = useWebsiteEventsQuery(websiteId, { view });
 
@@ -38,6 +38,7 @@ export function EventsDataTable({
     <DataGrid
       query={query}
       allowSearch={true}
+      searchDescription={t(messages.eventsSearchRule)}
       autoFocus={false}
       allowPaging={true}
       renderActions={renderActions}

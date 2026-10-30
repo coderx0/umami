@@ -84,29 +84,35 @@ text view reads right; and a task on it works by hand in the chat.
       board editor's: done with boards)
 
 **Websites**
-- [ ] `/websites`
-- [ ] `/websites/[websiteId]` (overview)
-- [ ] `/websites/[websiteId]/realtime`
-- [ ] `/websites/[websiteId]/sessions`, `/sessions/[sessionId]` (page and
+- [x] `/websites`
+- [x] `/websites/[websiteId]` (overview)
+- [x] `/websites/[websiteId]/realtime`
+- [x] `/websites/[websiteId]/sessions`, `/sessions/[sessionId]` (page and
       modal)
-- [ ] `/websites/[websiteId]/events`
-- [ ] `/websites/[websiteId]/compare`
-- [ ] `/websites/[websiteId]/segments`
-- [ ] `/websites/[websiteId]/cohorts`
-- [ ] `/websites/[websiteId]/replays`, `/replays/[replayId]` (page and modal)
-- [ ] `/websites/[websiteId]/settings`
+- [x] `/websites/[websiteId]/events`
+- [x] `/websites/[websiteId]/compare`
+- [x] `/websites/[websiteId]/segments`
+- [x] `/websites/[websiteId]/cohorts`
+- [x] `/websites/[websiteId]/replays` (`/replays/[replayId]` unchecked: the seed
+      has no replays)
+- [x] `/websites/[websiteId]/settings`
 
 **Reports** (`/websites/[websiteId]/…`)
-- [ ] `goals`
-- [ ] `funnels`
-- [ ] `journeys`
-- [ ] `retention`
-- [ ] `breakdown`
-- [ ] `attribution`
-- [ ] `utm`
-- [ ] `revenue`
-- [ ] `performance`
-- [ ] `heatmaps`
+- [x] `goals` (with its add and edit dialogs; the seed has no goals: one,
+      "Pricing viewed", was added through the dialog)
+- [x] `funnels` (with its add, edit and delete dialogs, and a step's event
+      filters)
+- [x] `journeys` (the diagram's steps are groups, its nodes toggles)
+- [x] `retention`
+- [x] `breakdown`
+- [x] `attribution`
+- [x] `utm` (the three empty parameters still read only "No data
+      available.": telling them apart would change the page's look)
+- [x] `revenue`
+- [x] `performance` (the seed has no web vitals: checked with zeros)
+- [x] `heatmaps` (the seed has no heatmap data: only its controls checked)
+
+Not yet done for Reports: a task by hand in the chat on each page.
 
 **Settings, admin, teams**
 - [ ] `/settings/profile`, `/settings/preferences`, `/settings/security`,
@@ -134,6 +140,55 @@ segments as path templates), per `../agent-om/docs/sitemap.md`; checked with
 `validateSitemap`.
 
 ## Notes
+
+- **Bug in agent-om core (blocks /websites/[websiteId]/settings):** a `<form>`
+  holding a field named `id` clobbers `form.id`, which then returns that
+  `<input>`. Core reads `el.id` (project.ts: `domId`, label lookups, warning
+  targets, unresolved references), stores the element in `node.domId`, and
+  the projector throws when it serializes the node ("Converting circular
+  structure to JSON"): the page's projection stops, stuck at `loading`.
+  Proposed fix: read `getAttribute('id')` everywhere core reads an element's
+  id, with a test on a form holding `<input name="id">`. Fixed on agent-om's
+  `fix/clobbered-element-id` (test fails without it), re-packed here.
+
+- **Finding for agent-om (core), fixed there:** `projectTable` took a
+  table's header row only from `<thead>`. An ARIA table (the APG pattern:
+  `role="table"`, a `role="rowgroup"` holding a `role="row"` of
+  `columnheader`s) got `columns: []` and its header as the first data
+  row; an empty one read as one row. Umami's top lists (`ListTable`) are such
+  tables. Core now takes the first row as the header when every cell in it is
+  a column header. Fixed on agent-om's `fix/aria-header-row-and-view` (test
+  fails without it), re-packed here.
+- **Finding for agent-om (core and the agent's view), not changed here:**
+  loose text equal to the name of an `<img>` beside it is dropped from the
+  text (the img node keeps the name), and Claude's outline doesn't show img
+  nodes inside text, so the word vanishes from what Claude reads ("Browser
+  [img Chrome] Chrome" read as "Browser"). Reproduced on a bare page. Umami's
+  icons were made decorative (`alt=""` beside their text, guidelines 1.6),
+  which avoids it here.
+- **Finding for agent-om (the agent's view), not changed here:** a read-only
+  text field (`state.readonly`) is still offered as `type`.
+- **Finding for agent-om (the agent's view), fixed there:** a toggle's
+  option left out its description (`candidates.ts`: text fields and clicks
+  added `describedOf`, toggles didn't), so Claude didn't see the journey
+  nodes' counts. Fixed on the same branch, re-packed here.
+- **Finding for agent-om (the agent's view), fixed there:** a control with
+  `aria-haspopup="dialog"` was offered as "opens its list"; it now says
+  "opens a dialog". Fixed on the same branch, re-packed here.
+
+- react-zen's combobox adds a chevron button ("Open") that opens the same
+  list as the combobox, and takes no props for it. Umami's `ComboBox` wrapper
+  marks it `data-agentom-ignore` after render (guidelines 1.6). The same
+  button logs a Base UI `nativeButton` error in the console, upstream.
+- react-zen's `FormField` rules don't expose `required`: required fields carry
+  `aria-required` themselves (guidelines 1.4). The cohort and segment dialogs
+  (done before this) don't yet.
+- The lookup hint said "separate up to 5 with commas", which reads as if a
+  value could hold several. It's the suggestions' search that splits on commas
+  (`getValues`); goals and funnels match their value exactly or with a `*` at
+  either end, and now say so.
+- Umami bug fixed on the way: the currency select's search compared the
+  lower-cased names with the text as typed, so "EUR" found nothing.
 
 - Umami's TypeScript settings (`strictNullChecks: false`) report errors
   inside the `agent` package's source (narrowing on `ok: true | false`

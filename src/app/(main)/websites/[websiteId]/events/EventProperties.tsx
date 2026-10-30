@@ -1,6 +1,6 @@
 'use client';
 import { Column, Grid, Label, ListItem, Row, Select } from '@umami/react-zen';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { ComboBox } from '@/components/common/ComboBox';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { Panel } from '@/components/common/Panel';
@@ -26,7 +26,9 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
   const [eventSearch, setEventSearch] = useState('');
   const [propertyName, setPropertyName] = useState('');
   const [propertyFilters, setPropertyFilters] = useState<PropertyFilter[]>([]);
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const eventChoicesId = useId();
+  const propertyChoicesId = useId();
 
   useEffect(() => {
     setPropertyName('');
@@ -107,6 +109,10 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
             >
               <Column gap="1" style={{ minWidth: 0 }}>
                 <Label>{t(labels.event)}</Label>
+                {/* what each offers (guidelines 1.16), from the same data as their lists */}
+                <span id={eventChoicesId} hidden>
+                  {`${t(labels.choices)}: ${eventNames.join(', ')}. ${t(messages.nameSearchRule)}`}
+                </span>
                 <Select
                   value={eventName}
                   onChange={value => handleEventChange(value as string)}
@@ -116,7 +122,11 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
                   onOpenChange={handleEventOpenChange}
                   placeholder={t(labels.selectEvent)}
                   maxHeight={400}
-                  buttonProps={{ style: { minWidth: 0, maxWidth: '100%', overflow: 'hidden' } }}
+                  buttonProps={{
+                    style: { minWidth: 0, maxWidth: '100%', overflow: 'hidden' },
+                    'aria-label': t(labels.event),
+                    'aria-describedby': eventChoicesId,
+                  }}
                   renderValue={({ defaultChildren }) => (
                     <span style={selectValueStyle}>{defaultChildren}</span>
                   )}
@@ -130,10 +140,19 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
               </Column>
               <Column gap="1" style={{ minWidth: 0 }}>
                 <Label>{t(labels.property)}</Label>
+                <span id={propertyChoicesId} hidden>
+                  {eventName
+                    ? `${t(labels.choices)}: ${properties.map(({ propertyName }) => propertyName).join(', ')}`
+                    : t(labels.selectEvent)}
+                </span>
                 <ComboBox
                   inputValue={propertyName}
                   onInputValueChange={setPropertyName}
                   isDisabled={!eventName}
+                  inputProps={{
+                    'aria-label': t(labels.property),
+                    'aria-describedby': propertyChoicesId,
+                  }}
                 >
                   {properties.map((field: { propertyName: string }) => (
                     <ListItem key={field.propertyName} id={field.propertyName}>

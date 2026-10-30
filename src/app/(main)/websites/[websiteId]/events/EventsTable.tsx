@@ -10,6 +10,7 @@ import {
   Row,
   Text,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { Avatar } from '@/components/common/Avatar';
 import { DateDistance } from '@/components/common/DateDistance';
 import { IconLabel } from '@/components/common/IconLabel';
@@ -60,7 +61,13 @@ export function EventsTable(props: DataTableProps) {
                 >
                   {row.eventName || renderLink(row.urlPath, row.hostname)}
                 </Text>
-                {row.hasData > 0 && <PropertiesButton websiteId={row.websiteId} eventId={row.id} />}
+                {row.hasData > 0 && (
+                  <PropertiesButton
+                    websiteId={row.websiteId}
+                    eventId={row.id}
+                    eventName={row.eventName || row.urlPath}
+                  />
+                )}
               </Row>
             </Row>
           );
@@ -69,7 +76,16 @@ export function EventsTable(props: DataTableProps) {
       <DataColumn id="session" label={t(labels.session)} width="80px">
         {(row: any) => {
           return (
-            <Link href={updateParams({ session: row.sessionId })}>
+            <Link
+              href={updateParams({ session: row.sessionId })}
+              aria-label={`${t(labels.viewDetails)}: ${t(labels.session)} ${[
+                row.city,
+                formatValue(row.country, 'country'),
+              ]
+                .filter(Boolean)
+                .join(', ')}`}
+              data-agentom-id={`event.${row.id}.session`}
+            >
               <Avatar seed={row.sessionId} size={32} />
             </Link>
           );
@@ -103,10 +119,27 @@ export function EventsTable(props: DataTableProps) {
   );
 }
 
-const PropertiesButton = props => {
+const PropertiesButton = ({
+  eventName,
+  ...props
+}: {
+  websiteId: string;
+  eventId: string;
+  eventName: string;
+}) => {
+  const { t, labels, messages } = useMessages();
+  const hintId = useId();
   return (
     <DialogTrigger>
-      <Button variant="quiet">
+      <span id={hintId} hidden>
+        {t(messages.eventPropertiesHint)}
+      </span>
+      <Button
+        variant="quiet"
+        aria-label={`${t(labels.properties)}: ${eventName}`}
+        aria-describedby={hintId}
+        data-agentom-id={`event.${props.eventId}.properties`}
+      >
         <Row alignItems="center" gap>
           <Icon>
             <FileText />

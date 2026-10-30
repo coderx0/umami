@@ -375,11 +375,11 @@ packages:
     version: 0.0.0
 
   '@agent-om/agent@file:vendor/agent-om/agent-om-agent-0.0.0.tgz':
-    resolution: {integrity: sha512-UinVxjm/ykHKXnsn9mUEP9M116cSEZZ+FQsF8/58qNhGv9id3EsgxWCxcD8q69z7cm1mbW198MgU7WG3E/q3og==, tarball: file:vendor/agent-om/agent-om-agent-0.0.0.tgz}
+    resolution: {integrity: sha512-cJ9Gvx2w1+34cnypFnhSrXpD9qH1NeAl1otbByDacRlxXDT+fvzoji5bNs/G84Wfz1SCCfw7pUXrWaUHpuG8Zw==, tarball: file:vendor/agent-om/agent-om-agent-0.0.0.tgz}
     version: 0.0.0
 
   '@agent-om/core@file:vendor/agent-om/agent-om-core-0.0.0.tgz':
-    resolution: {integrity: sha512-ALBO4Db1Gi2VI7LJpI/7zVym2/dpfYTcQgbZQRB3KbXzsBG/ZHWODNpiU9ixDGPPdnOPcyB30Xgfpob4e+5E2w==, tarball: file:vendor/agent-om/agent-om-core-0.0.0.tgz}
+    resolution: {integrity: sha512-bMpWBH8aUYs0hqqyFGf0RY0BRb+8cajJonpP079KnbhX0i2B9agmyuiiP13VIBrBBj+VGE3GapXdoSVF9hT6lA==, tarball: file:vendor/agent-om/agent-om-core-0.0.0.tgz}
     version: 0.0.0
 
   '@agent-om/react@file:vendor/agent-om/agent-om-react-0.0.0.tgz':

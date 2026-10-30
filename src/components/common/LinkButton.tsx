@@ -35,5 +35,9 @@ export function LinkButton({
     </Link>
   );
 
-  return <Button {...props} variant={variant} nativeButton={false} render={linkElement} />;
+  // It navigates, so it's a link with its address (guidelines 1.11), styled as a button:
+  // Base UI gives a non-native button role="button", which would hide that.
+  return (
+    <Button {...props} variant={variant} nativeButton={false} render={linkElement} role="link" />
+  );
 }

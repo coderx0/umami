@@ -20,7 +20,20 @@ export function Legend({
         const color = colord(fillStyle);
 
         return (
-          <Row key={text} onClick={() => onClick(item)}>
+          // a toggle: whether the series is shown (guidelines 1.1, 1.4)
+          <Row
+            key={text}
+            onClick={() => onClick(item)}
+            role="button"
+            tabIndex={0}
+            aria-pressed={!hidden}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick(item);
+              }
+            }}
+          >
             <StatusLight color={color.alpha(color.alpha() + 0.2).toHex()}>
               <Text
                 size="sm"

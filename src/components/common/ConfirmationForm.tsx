@@ -10,6 +10,8 @@ export interface ConfirmationFormProps {
   error?: string | Error;
   onConfirm?: () => void;
   onClose?: () => void;
+  /** what confirming does (guidelines 4.1, 4.3): every use deletes or removes something */
+  risk?: 'destructive' | 'sensitive';
 }
 
 export function ConfirmationForm({
@@ -20,6 +22,7 @@ export function ConfirmationForm({
   error,
   onConfirm,
   onClose,
+  risk = 'destructive',
 }: ConfirmationFormProps) {
   const { t, labels, getErrorMessage } = useMessages();
 
@@ -29,6 +32,8 @@ export function ConfirmationForm({
       <FormButtons>
         <Button onPress={onClose}>{t(labels.cancel)}</Button>
         <FormSubmitButton
+          data-agentom-id="confirmation.confirm"
+          data-agentom-risk={risk}
           data-test="button-confirm"
           isLoading={isLoading}
           variant={buttonVariant}

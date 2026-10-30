@@ -1,5 +1,5 @@
 import { type ComboBoxProps, cn, Label, ListItem, Loading, useDebounce } from '@umami/react-zen';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { ComboBox } from '@/components/common/ComboBox';
 import { Empty } from '@/components/common/Empty';
 import { useMessages, useWebsiteValuesQuery } from '@/components/hooks';
@@ -18,6 +18,8 @@ export interface WebsiteValueComboBoxProps
   endDate: Date;
   value: string;
   onChange: (value: string) => void;
+  /** what the field does and suggests, as its description (guidelines 1.16) */
+  description?: string;
 }
 
 export function WebsiteValueComboBox({
@@ -31,9 +33,11 @@ export function WebsiteValueComboBox({
   label,
   className,
   placeholder = DEFAULT_PLACEHOLDER,
+  description,
   ...props
 }: WebsiteValueComboBoxProps) {
   const { t, messages } = useMessages();
+  const hintId = useId();
   const [search, setSearch] = useState(value);
   const searchValue = useDebounce(search, 300);
   const primaryQuery = useWebsiteValuesQuery({
@@ -68,9 +72,19 @@ export function WebsiteValueComboBox({
   return (
     <div className={cn('flex flex-col gap-1', className)}>
       {label && <Label>{label}</Label>}
+      {description && (
+        <span id={hintId} hidden>
+          {description}
+        </span>
+      )}
       <ComboBox
         {...props}
         aria-label={props['aria-label'] ?? label}
+        // the root renders no element: the name and description go on the input
+        inputProps={{
+          'aria-label': props['aria-label'] ?? label,
+          'aria-describedby': description ? hintId : undefined,
+        }}
         items={items}
         inputValue={value}
         placeholder={placeholder}

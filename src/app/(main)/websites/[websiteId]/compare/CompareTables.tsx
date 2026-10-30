@@ -1,5 +1,5 @@
 import { Column, Grid, Heading, ListItem, Row, Select } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { DateDisplay } from '@/components/common/DateDisplay';
 import { Panel } from '@/components/common/Panel';
 import { useDateRange, useMessages, useNavigation } from '@/components/hooks';
@@ -148,11 +148,19 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
     router.push(renderPath(id));
   };
 
+  const choicesId = useId();
+  const viewLabel = items.find(({ id }) => id === view)?.label;
+
   return (
     <>
       <Row width="300px">
+        {/* what it offers, from the same items it lists (guidelines 1.16) */}
+        <span id={choicesId} hidden>
+          {`${t(labels.choices)}: ${items.map(({ label }) => label).join(', ')}`}
+        </span>
         <Select
           label={t(labels.compare)}
+          buttonProps={{ 'aria-describedby': choicesId }}
           value={view}
           onChange={handleChange}
           maxHeight={480}
@@ -177,6 +185,9 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
               type={view}
               limit={20}
               showMore={false}
+              title={viewLabel}
+              metric={t(labels.visitors)}
+              label={`${t(labels.previous)}: ${viewLabel}`}
               params={params}
               onDataLoad={setData}
             />
@@ -191,6 +202,9 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
               type={view}
               limit={20}
               showMore={false}
+              title={viewLabel}
+              metric={t(labels.visitors)}
+              label={`${t(labels.current)}: ${viewLabel}`}
               renderChange={renderChange}
             />
           </Column>

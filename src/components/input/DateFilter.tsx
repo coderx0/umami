@@ -1,5 +1,5 @@
 import { Dialog, ListItem, ListSeparator, Modal, Select, type SelectProps } from '@umami/react-zen';
-import { Fragment, type Key, useState } from 'react';
+import { Fragment, type Key, useId, useState } from 'react';
 import { ControlledDialog } from '@/components/common/ControlledDialog';
 import { DateDisplay } from '@/components/common/DateDisplay';
 import { useMessages, useMobile } from '@/components/hooks';
@@ -24,6 +24,7 @@ export function DateFilter({
 }: DateFilterProps) {
   const { t, labels } = useMessages();
   const [showPicker, setShowPicker] = useState(false);
+  const choicesId = useId();
   const { startDate, endDate } = parseDateRange(value) || {};
   const { isMobile } = useMobile();
 
@@ -101,16 +102,26 @@ export function DateFilter({
   };
 
   const selectedValue = value.endsWith(':all') ? 'all' : value;
+  // what it offers, from the same options it renders (named before it opens)
+  const choices = `${t(labels.choices)}: ${options.map(({ label }: any) => label).join(', ')}`;
 
   const [side, align] = String(placement).split(' ');
 
   return (
     <>
+      <span id={choicesId} hidden>
+        {choices}
+      </span>
       <Select
         {...props}
         value={selectedValue}
         placeholder={t(labels.selectDate)}
         onChange={handleChange}
+        buttonProps={{
+          ...props.buttonProps,
+          'aria-label': t(labels.dateRange),
+          'aria-describedby': choicesId,
+        }}
         renderValue={renderValue}
         popoverProps={{
           side: side as any,

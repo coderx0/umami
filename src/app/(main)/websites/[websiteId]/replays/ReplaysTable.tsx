@@ -31,7 +31,10 @@ export function ReplaysTable({ ...props }: DataTableProps) {
       </DataColumn>
       <DataColumn id="id" label={t(labels.session)} width="100px">
         {(row: any) => (
-          <Link href={updateParams({ session: row.sessionId })}>
+          <Link
+            href={updateParams({ session: row.sessionId })}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)}`}
+          >
             <Avatar seed={row.sessionId} size={32} />
           </Link>
         )}

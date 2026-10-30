@@ -1,6 +1,7 @@
 import { useTheme } from '@umami/react-zen';
 import { useCallback, useMemo } from 'react';
 import { BarChart, type BarChartProps } from '@/components/charts/BarChart';
+import { ChartDataTable } from '@/components/charts/ChartDataTable';
 import { useLocale, useMessages } from '@/components/hooks';
 import { renderDateLabels } from '@/lib/charts';
 import { getThemeColors } from '@/lib/colors';
@@ -84,15 +85,25 @@ export function PageviewsChart({ data, unit, minDate, maxDate, ...props }: Pagev
 
   const renderXLabel = useCallback(renderDateLabels(unit, locale), [unit, locale]);
 
+  // the drawing is visual only; its figures are in the table beside it (guidelines 3.4)
   return (
-    <BarChart
-      {...props}
-      chartData={chartData}
-      unit={unit}
-      minDate={minDate}
-      maxDate={maxDate}
-      renderXLabel={renderXLabel}
-      height="400px"
-    />
+    <>
+      <ChartDataTable
+        caption={t(labels.trafficOverTime)}
+        datasets={chartData?.datasets}
+        unit={unit}
+      />
+      <div data-agentom-ignore="" aria-hidden="true">
+        <BarChart
+          {...props}
+          chartData={chartData}
+          unit={unit}
+          minDate={minDate}
+          maxDate={maxDate}
+          renderXLabel={renderXLabel}
+          height="400px"
+        />
+      </div>
+    </>
   );
 }

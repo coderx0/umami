@@ -1,5 +1,6 @@
 import { Column, Heading, Row, Text } from '@umami/react-zen';
 import { Plus } from 'lucide-react';
+import { useId } from 'react';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useMessages, useWebsiteSharesQuery } from '@/components/hooks';
 import { DialogButton } from '@/components/input/DialogButton';
@@ -15,6 +16,7 @@ export function WebsiteShareForm({ websiteId }: WebsiteShareFormProps) {
   const { data, error, isLoading } = useWebsiteSharesQuery({ websiteId });
 
   const shares = data?.data || [];
+  const shareHintId = useId();
   const hasShares = shares.length > 0;
 
   return (
@@ -22,10 +24,16 @@ export function WebsiteShareForm({ websiteId }: WebsiteShareFormProps) {
       <Column gap="4">
         <Row justifyContent="space-between" alignItems="center">
           <Heading>{t(labels.share)}</Heading>
+          <span id={shareHintId} hidden>
+            {t(messages.shareUrl)}
+          </span>
           <DialogButton
             icon={<Plus size={16} />}
             label={t(labels.add)}
             title={t(labels.share)}
+            aria-label={t(labels.addShareLink)}
+            aria-describedby={shareHintId}
+            data-agentom-id="share.add"
             variant="primary"
             width="600px"
           >

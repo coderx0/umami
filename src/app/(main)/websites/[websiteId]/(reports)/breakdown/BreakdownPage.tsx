@@ -1,10 +1,10 @@
 'use client';
 import { Column, Row } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { FieldSelectForm } from '@/app/(main)/websites/[websiteId]/(reports)/breakdown/FieldSelectForm';
 import { WebsiteControls } from '@/app/(main)/websites/[websiteId]/WebsiteControls';
 import { Panel } from '@/components/common/Panel';
-import { useBreakdownQuery, useDateRange, useMessages } from '@/components/hooks';
+import { useBreakdownQuery, useDateRange, useFields, useMessages } from '@/components/hooks';
 import { ListCheck } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
 import { DownloadButton } from '@/components/input/DownloadButton';
@@ -43,19 +43,31 @@ export function BreakdownPage({ websiteId }: { websiteId: string }) {
 }
 
 const FieldsButton = ({ value, onChange }) => {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const { fields } = useFields();
+  const hintId = useId();
+  // the fields the dialog offers, as FieldSelectForm lists them
+  const choices = fields.filter(field => field.name !== 'event').map(field => field.filterLabel);
 
   return (
-    <DialogButton
-      icon={<ListCheck />}
-      label={t(labels.fields)}
-      width="400px"
-      minHeight="300px"
-      variant="outline"
-    >
-      {({ close }) => {
-        return <FieldSelectForm selectedFields={value} onChange={onChange} onClose={close} />;
-      }}
-    </DialogButton>
+    <>
+      {/* what the dialog asks for (guidelines 1.16) */}
+      <span id={hintId} hidden>
+        {t(messages.breakdownFieldsHint, { fields: choices.join(', ') })}
+      </span>
+      <DialogButton
+        icon={<ListCheck />}
+        label={t(labels.fields)}
+        width="400px"
+        minHeight="300px"
+        variant="outline"
+        aria-describedby={hintId}
+        data-agentom-id="breakdown.fields"
+      >
+        {({ close }) => {
+          return <FieldSelectForm selectedFields={value} onChange={onChange} onClose={close} />;
+        }}
+      </DialogButton>
+    </>
   );
 };

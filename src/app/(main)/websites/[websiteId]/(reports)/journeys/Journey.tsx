@@ -1,5 +1,5 @@
 import { Column, cn, Icon, Row, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { firstBy } from 'thenby';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useEscapeKey, useJourneyQuery, useMessages } from '@/components/hooks';
@@ -31,7 +31,8 @@ const EVENT_TYPES = {
 export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyProps) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [activeNode, setActiveNode] = useState(null);
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const hintId = useId();
   const { data, error, isLoading } = useJourneyQuery({
     websiteId,
     steps,
@@ -161,16 +162,23 @@ export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyP
 
   return (
     <LoadingPanel data={data} isLoading={isLoading} error={error} height="100%">
+      <span id={hintId} hidden>
+        {t(messages.journeyNodeHint)}
+      </span>
       <div className={styles.container}>
         <div className={styles.view}>
           {columns.map(({ visitorCount, nodes }, columnIndex) => {
             return (
+              // each step a group named by its number and visitors (guidelines 1.12)
               <div
                 key={columnIndex}
                 className={cn(styles.column, {
                   [styles.selected]: selectedNode,
                   [styles.active]: activeNode,
                 })}
+                role="group"
+                aria-label={`${t(labels.stepNumber, { number: columnIndex + 1 })}: ${formatLongNumber(visitorCount)} ${t(labels.visitors)}`}
+                data-agentom-id={`journey.step-${columnIndex + 1}`}
               >
                 <div className={styles.header}>
                   <div className={styles.num}>{columnIndex + 1}</div>
@@ -204,6 +212,8 @@ export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyP
                           : 0;
 
                       const dropped = 100 - remaining;
+                      const descriptionId = `${hintId}-${columnIndex}-${encodeURIComponent(name)}`;
+                      const toggle = () => handleClick(name, columnIndex, paths);
 
                       return (
                         <div
@@ -214,12 +224,38 @@ export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyP
                           }
                           onMouseLeave={() => selected && setActiveNode(null)}
                         >
+                          {/* what the node counts, which the tooltip only shows on hover */}
+                          <span id={descriptionId} hidden>
+                            {`${formatLongNumber(nodeCount)} ${t(labels.visitors)}`}
+                            {selectedNode && !selected
+                              ? `, ${t(messages.journeyNodeOutside)}`
+                              : columnIndex > 0
+                                ? `, ${remaining}% ${t(labels.conversion)}, ${dropped}% ${t(labels.dropoff)}`
+                                : ''}
+                            .
+                          </span>
+                          {/* a toggle: pressed, only the journeys through it are counted (guidelines 1.4) */}
                           <div
                             className={cn(styles.node, {
                               [styles.selected]: selected,
                               [styles.active]: active,
                             })}
-                            onClick={() => handleClick(name, columnIndex, paths)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={name}
+                            aria-pressed={
+                              selected &&
+                              selectedNode?.columnIndex === columnIndex &&
+                              selectedNode?.name === name
+                            }
+                            aria-describedby={`${descriptionId} ${hintId}`}
+                            onClick={toggle}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                toggle();
+                              }
+                            }}
                           >
                             <Row alignItems="center" className={styles.name} title={name} gap>
                               <Icon>{name.startsWith('/') ? <File /> : <Lightning />}</Icon>

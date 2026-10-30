@@ -10,7 +10,7 @@ import {
   TabPanel,
   Tabs,
 } from '@umami/react-zen';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { GridRow } from '@/components/common/GridRow';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { Panel } from '@/components/common/Panel';
@@ -65,6 +65,7 @@ export function Revenue({ websiteId, startDate, endDate, unit }: RevenueProps) {
   };
 
   const { t, labels } = useMessages();
+  const chartModeChoicesId = useId();
   const { compare } = useDateRange();
   const chartQuery = useRevenueChartQuery(websiteId, currency);
   const statsQuery = useRevenueStatsQuery({ websiteId, currency, compare });
@@ -90,11 +91,18 @@ export function Revenue({ websiteId, startDate, endDate, unit }: RevenueProps) {
             <RevenueMetricsBar data={data.total} currency={currency} />
             <Panel>
               <Row justifyContent="end">
+                <span id={chartModeChoicesId} hidden>
+                  {`${t(labels.choices)}: ${t(labels.period)}, ${t(labels.cumulative)}`}
+                </span>
                 <Select
                   value={revenueChartMode}
                   onChange={value => handleRevenueChartModeChange(value as RevenueChartMode)}
                   popoverProps={{ side: 'bottom', align: 'end' }}
-                  buttonProps={{ style: { width: 140 } }}
+                  buttonProps={{
+                    style: { width: 140 },
+                    'aria-label': t(labels.revenueChartMode),
+                    'aria-describedby': chartModeChoicesId,
+                  }}
                 >
                   <ListItem id="period">{t(labels.period)}</ListItem>
                   <ListItem id="cumulative">{t(labels.cumulative)}</ListItem>

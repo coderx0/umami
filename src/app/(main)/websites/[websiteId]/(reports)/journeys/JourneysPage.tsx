@@ -1,6 +1,6 @@
 'use client';
 import { Column, Grid, ListItem, Row, Select } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { WebsiteControls } from '@/app/(main)/websites/[websiteId]/WebsiteControls';
 import { Panel } from '@/components/common/Panel';
 import { useDateRange, useMessages } from '@/components/hooks';
@@ -12,7 +12,8 @@ const JOURNEY_STEPS = [2, 3, 4, 5, 6, 7];
 const DEFAULT_STEP = 3;
 
 export function JourneysPage({ websiteId }: { websiteId: string }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const stepsChoicesId = useId();
   const {
     dateRange: { startDate, endDate },
   } = useDateRange();
@@ -42,8 +43,12 @@ export function JourneysPage({ websiteId }: { websiteId: string }) {
     <Column gap>
       <WebsiteControls websiteId={websiteId} />
       <Grid columns="repeat(3, 1fr)" gap>
+        <span id={stepsChoicesId} hidden>
+          {`${t(labels.choices)}: ${JOURNEY_STEPS.join(', ')}`}
+        </span>
         <Select
           label={t(labels.steps)}
+          buttonProps={{ 'aria-describedby': stepsChoicesId }}
           value={steps}
           defaultValue={steps}
           onChange={value => setSteps(Number(value))}
@@ -57,6 +62,7 @@ export function JourneysPage({ websiteId }: { websiteId: string }) {
         <Column>
           <WebsiteValueComboBox
             label={t(labels.startStep)}
+            description={t(messages.journeyStartHint)}
             websiteId={websiteId}
             type={stepType}
             additionalType={additionalStepType}
@@ -69,6 +75,7 @@ export function JourneysPage({ websiteId }: { websiteId: string }) {
         <Column>
           <WebsiteValueComboBox
             label={t(labels.endStep)}
+            description={t(messages.journeyEndHint)}
             websiteId={websiteId}
             type={stepType}
             additionalType={additionalStepType}

@@ -50,7 +50,44 @@ export function Retention({ websiteId, days = DAYS, startDate, endDate }: Retent
     <LoadingPanel data={data} isLoading={isLoading} error={error}>
       {data && (
         <Panel allowFullscreen height="900px">
+          {/* the grid's figures as a table, visually hidden (guidelines 3.4) */}
+          <table className="sr-only">
+            <caption>{t(labels.retention)}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{t(labels.cohort)}</th>
+                <th scope="col">{t(labels.visitors)}</th>
+                {days.map(day => (
+                  <th key={day} scope="col">
+                    {t(labels.day)} {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(({ date, visitors, records }: any) => {
+                const maxDay = differenceInCalendarDays(endDate, new Date(date));
+                return (
+                  <tr key={date}>
+                    <th scope="row">{formatDate(date, 'PP', locale)}</th>
+                    <td>{visitors}</td>
+                    {days.map(day => {
+                      // a day not reached yet is empty; a day with no record had no returns
+                      const percentage = records.find(a => a.day === day)?.percentage;
+                      return (
+                        <td key={day}>
+                          {day > maxDay ? '' : `${Number(percentage ?? 0).toFixed(2)}%`}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
           <Column
+            data-agentom-ignore=""
+            aria-hidden="true"
             paddingY="6"
             paddingX={{ base: '3', md: '6' }}
             position="absolute"

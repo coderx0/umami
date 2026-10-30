@@ -13,8 +13,9 @@ import {
   Text,
 } from '@umami/react-zen';
 import { colord } from 'colord';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 import { BarChart } from '@/components/charts/BarChart';
+import { ChartDataTable } from '@/components/charts/ChartDataTable';
 import { GridRow } from '@/components/common/GridRow';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { Panel } from '@/components/common/Panel';
@@ -67,6 +68,7 @@ export function Performance({ websiteId, startDate, endDate, unit }: Performance
   const [selectedMetric, setSelectedMetric] = useState<string>('lcp');
   const [selectedPercentile, setSelectedPercentile] = useState<'p50' | 'p75' | 'p95'>('p75');
   const { t, labels } = useMessages();
+  const percentileChoicesId = useId();
   const { locale, dateLocale } = useLocale();
 
   const queryParams = { websiteId, startDate, endDate, unit };
@@ -148,9 +150,14 @@ export function Performance({ websiteId, startDate, endDate, unit }: Performance
 
   return (
     <Column gap>
+      {/* what the select offers, named before it opens (guidelines 1.16) */}
+      <span id={percentileChoicesId} hidden>
+        {`${t(labels.choices)}: ${PERCENTILES.map(({ label }) => label).join(', ')}`}
+      </span>
       <Grid columns="280px" gap>
         <Select
           label="Percentile"
+          buttonProps={{ 'aria-describedby': percentileChoicesId }}
           value={selectedPercentile}
           onChange={value => setSelectedPercentile(value as 'p50' | 'p75' | 'p95')}
         >
@@ -163,7 +170,12 @@ export function Performance({ websiteId, startDate, endDate, unit }: Performance
       </Grid>
       <Column gap>
         <LoadingPanel data={stats.data} isLoading={stats.isLoading} error={stats.error}>
-          <Grid columns={{ base: '1fr 1fr', lg: 'repeat(5, 1fr)' }} gap>
+          <Grid
+            columns={{ base: '1fr 1fr', lg: 'repeat(5, 1fr)' }}
+            gap
+            role="radiogroup"
+            aria-label={t(labels.chartMetric)}
+          >
             {METRICS.map(metric => (
               <PerformanceCard
                 key={metric}
@@ -188,20 +200,28 @@ export function Performance({ websiteId, startDate, endDate, unit }: Performance
                   </Text>
                 </Row>
               </Row>
-              <BarChart
-                chartData={chartData}
-                minDate={startDate}
-                maxDate={endDate}
+              {/* the drawing is visual only; its figures are in the table beside it (guidelines 3.4) */}
+              <ChartDataTable
+                caption={`${METRIC_LABELS[selectedMetric]}${isCls ? '' : ' (ms)'}`}
+                datasets={chartData.datasets}
                 unit={unit}
-                renderXLabel={renderXLabel}
-                renderYLabel={(label: string) => {
-                  const val = Number(label);
-                  if (selectedMetric === 'cls') return val.toFixed(2);
-                  if (val >= 1000) return `${(val / 1000).toFixed(2)} s`;
-                  return `${Math.round(val)} ms`;
-                }}
-                height="400px"
               />
+              <div data-agentom-ignore="" aria-hidden="true">
+                <BarChart
+                  chartData={chartData}
+                  minDate={startDate}
+                  maxDate={endDate}
+                  unit={unit}
+                  renderXLabel={renderXLabel}
+                  renderYLabel={(label: string) => {
+                    const val = Number(label);
+                    if (selectedMetric === 'cls') return val.toFixed(2);
+                    if (val >= 1000) return `${(val / 1000).toFixed(2)} s`;
+                    return `${Math.round(val)} ms`;
+                  }}
+                  height="400px"
+                />
+              </div>
             </Column>
           </Panel>
         </LoadingPanel>

@@ -1,6 +1,6 @@
 import { Button, Icon, ListItem, Row, Select, Text } from '@umami/react-zen';
 import { isAfter } from 'date-fns';
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useDateRange, useDateRangeQuery, useMessages, useNavigation } from '@/components/hooks';
 import { ChevronRight } from '@/components/icons';
 import { getDateRangeValue } from '@/lib/date';
@@ -22,6 +22,7 @@ export function WebsiteDateFilter({
 }: WebsiteDateFilterProps) {
   const { dateRange, isAllTime, isCustomRange } = useDateRange();
   const { t, labels } = useMessages();
+  const compareChoicesId = useId();
   const {
     router,
     updateParams,
@@ -65,12 +66,23 @@ export function WebsiteDateFilter({
     <Row wrap="wrap" gap>
       {showButtons && !isAllTime && !isCustomRange && (
         <Row gap="1">
-          <Button onPress={() => handleIncrement(-1)} variant="outline">
+          <Button
+            onPress={() => handleIncrement(-1)}
+            variant="outline"
+            aria-label={t(labels.previousPeriod)}
+            data-agentom-id="filter.previous-period"
+          >
             <Icon rotate={180}>
               <ChevronRight />
             </Icon>
           </Button>
-          <Button onPress={() => handleIncrement(1)} variant="outline" isDisabled={disableForward}>
+          <Button
+            onPress={() => handleIncrement(1)}
+            variant="outline"
+            isDisabled={disableForward}
+            aria-label={t(labels.nextPeriod)}
+            data-agentom-id="filter.next-period"
+          >
             <Icon>
               <ChevronRight />
             </Icon>
@@ -79,6 +91,7 @@ export function WebsiteDateFilter({
       )}
       <DateFilter
         className="min-w-[200px]"
+        buttonProps={{ ...({ 'data-agentom-id': 'filter.date-range' } as Record<string, string>) }}
         value={dateValue}
         onChange={handleChange}
         showAllTime={hasData && showAllTime}
@@ -87,11 +100,19 @@ export function WebsiteDateFilter({
       {showCompare && (
         <Row alignItems="center" gap>
           <Text weight="bold">VS</Text>
+          <span id={compareChoicesId} hidden>
+            {`${t(labels.choices)}: ${t(labels.previousPeriod)}, ${t(labels.previousYear)}`}
+          </span>
           <Row width="200px">
             <Select
               value={compare}
               onChange={handleSelect}
-              buttonProps={{ style: { width: 200 } }}
+              buttonProps={{
+                style: { width: 200 },
+                'aria-label': t(labels.compareTo),
+                'aria-describedby': compareChoicesId,
+                ...({ 'data-agentom-id': 'filter.compare' } as Record<string, string>),
+              }}
               popoverProps={{ style: { width: 200 } }}
             >
               <ListItem id="prev">{t(labels.previousPeriod)}</ListItem>

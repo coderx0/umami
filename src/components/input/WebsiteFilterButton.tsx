@@ -1,6 +1,6 @@
 import { Checkbox, Row } from '@umami/react-zen';
-import { useState } from 'react';
-import { useFilters, useMessages, useNavigation } from '@/components/hooks';
+import { useId, useState } from 'react';
+import { useFields, useFilters, useMessages, useNavigation } from '@/components/hooks';
 import { ListFilter } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
 import { FilterEditForm } from '@/components/input/FilterEditForm';
@@ -24,6 +24,8 @@ export function WebsiteFilterButton({
   const { filters: currentFilters } = useFilters();
   const isEventsPath = pathname.endsWith('/events');
   const [excludeBounce, setExcludeBounce] = useState(!!query.excludeBounce);
+  const { fields } = useFields();
+  const choicesId = useId();
   const isOverview =
     /^\/teams\/[^/]+\/websites\/[^/]+$/.test(pathname) || /^\/share\/[^/]+$/.test(pathname);
 
@@ -68,31 +70,48 @@ export function WebsiteFilterButton({
     router.push(url);
   };
 
+  // what the dialog offers, from the same fields and tabs it shows (named before it opens)
+  const choices = [
+    `${t(labels.fields)} (${fields.map(({ filterLabel }) => filterLabel).join(', ')})`,
+    t(labels.segments),
+    t(labels.cohorts),
+    ...(isEventsPath ? [t(labels.eventProperties)] : []),
+    t(labels.sessionData),
+    ...(isOverview || allowBounceFilter ? [t(labels.excludeBounce)] : []),
+  ];
+
   return (
-    <DialogButton
-      icon={<ListFilter />}
-      label={t(labels.filter)}
-      variant="outline"
-      height="min(80dvh, calc(100dvh - 40px))"
-    >
-      {({ close }) => {
-        return (
-          <>
-            {(isOverview || allowBounceFilter) && (
-              <Row position="absolute" top="30px" right="30px">
-                <Checkbox
-                  value={excludeBounce ? 'true' : ''}
-                  onChange={setExcludeBounce}
-                  style={{ marginTop: '3px' }}
-                >
-                  {t(labels.excludeBounce)}
-                </Checkbox>
-              </Row>
-            )}
-            <FilterEditForm websiteId={websiteId} onChange={handleChange} onClose={close} />
-          </>
-        );
-      }}
-    </DialogButton>
+    <>
+      <span id={choicesId} hidden>
+        {`${t(labels.choices)}: ${choices.join('; ')}`}
+      </span>
+      <DialogButton
+        icon={<ListFilter />}
+        label={t(labels.filter)}
+        variant="outline"
+        height="min(80dvh, calc(100dvh - 40px))"
+        aria-describedby={choicesId}
+        data-agentom-id="filter.open"
+      >
+        {({ close }) => {
+          return (
+            <>
+              {(isOverview || allowBounceFilter) && (
+                <Row position="absolute" top="30px" right="30px">
+                  <Checkbox
+                    value={excludeBounce ? 'true' : ''}
+                    onChange={setExcludeBounce}
+                    style={{ marginTop: '3px' }}
+                  >
+                    {t(labels.excludeBounce)}
+                  </Checkbox>
+                </Row>
+              )}
+              <FilterEditForm websiteId={websiteId} onChange={handleChange} onClose={close} />
+            </>
+          );
+        }}
+      </DialogButton>
+    </>
   );
 }

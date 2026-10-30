@@ -42,6 +42,7 @@ function UTMDimension({ websiteId, startDate, endDate, param }: UTMProps & { par
   const total = items.reduce((sum, { views }) => {
     return +sum + +views;
   }, 0);
+  const name = param.replace(/^utm_/, '');
 
   return (
     <LoadingPanel data={items} isLoading={isLoading} error={error} minHeight="300px">
@@ -49,9 +50,10 @@ function UTMDimension({ websiteId, startDate, endDate, param }: UTMProps & { par
         <Grid columns={{ base: '1fr', md: '1fr 1fr' }} gap="6">
           <Column>
             <Heading>
-              <Text transform="capitalize">{param.replace(/^utm_/, '')}</Text>
+              <Text transform="capitalize">{name}</Text>
             </Heading>
             <ListTable
+              label={name.charAt(0).toUpperCase() + name.slice(1)}
               metric={t(labels.views)}
               data={items.map(({ utm, views }) => ({
                 label: utm,
@@ -60,7 +62,8 @@ function UTMDimension({ websiteId, startDate, endDate, param }: UTMProps & { par
               }))}
             />
           </Column>
-          <Column>
+          {/* the drawing is visual only; its figures are the table's (guidelines 3.4) */}
+          <Column data-agentom-ignore="" aria-hidden="true">
             <PieChart type="doughnut" chartData={chartData} />
           </Column>
         </Grid>

@@ -1,13 +1,19 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useNavigation, useWebsiteSessionsQuery } from '@/components/hooks';
+import { useMessages, useNavigation, useWebsiteSessionsQuery } from '@/components/hooks';
 import { SessionsTable } from './SessionsTable';
 
 export function SessionsDataTable({ websiteId }: { websiteId: string }) {
   const queryResult = useWebsiteSessionsQuery(websiteId);
   const { updateParams } = useNavigation();
+  const { t, messages } = useMessages();
 
   return (
-    <DataGrid query={queryResult} allowPaging allowSearch>
+    <DataGrid
+      query={queryResult}
+      allowPaging
+      allowSearch
+      searchDescription={t(messages.sessionsSearchRule)}
+    >
       {({ data }) => (
         <SessionsTable
           data={data}

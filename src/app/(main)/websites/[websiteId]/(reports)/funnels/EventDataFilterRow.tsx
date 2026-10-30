@@ -10,7 +10,7 @@ import {
   useDebounce,
 } from '@umami/react-zen';
 import { endOfDay, subMonths } from 'date-fns';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { ComboBox } from '@/components/common/ComboBox';
 import { Empty } from '@/components/common/Empty';
 import { useApi, useMessages, useMobile } from '@/components/hooks';
@@ -37,7 +37,8 @@ function PropertySelect({
   onPropertyChange?: (value: string) => void;
 }) {
   const { get, useQuery } = useApi();
-  const { t, messages } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const hintId = useId();
   const [search, setSearch] = useState(value ?? '');
   const searchValue = useDebounce(search, 300);
   const { startAt, endAt } = getEventDataDateRange();
@@ -59,29 +60,34 @@ function PropertySelect({
   const properties: string[] = Array.from(new Set<string>(data?.map(d => d.propertyName) ?? []));
 
   return (
-    <ComboBox
-      aria-label="PropertySelect"
-      items={properties}
-      inputValue={value}
-      onInputValueChange={v => {
-        setSearch(v);
-        onChange?.(v);
-        onPropertyChange?.(v);
-      }}
-      renderEmptyState={() =>
-        isLoading ? (
-          <Loading placement="center" icon="dots" />
-        ) : (
-          <Empty message={t(messages.noResultsFound)} />
-        )
-      }
-    >
-      {properties.map(p => (
-        <ListItem key={p} id={p}>
-          {p}
-        </ListItem>
-      ))}
-    </ComboBox>
+    <>
+      <span id={hintId} hidden>
+        {t(messages.propertyLookupHint)}
+      </span>
+      <ComboBox
+        inputProps={{ 'aria-label': t(labels.property), 'aria-describedby': hintId }}
+        items={properties}
+        inputValue={value}
+        onInputValueChange={v => {
+          setSearch(v);
+          onChange?.(v);
+          onPropertyChange?.(v);
+        }}
+        renderEmptyState={() =>
+          isLoading ? (
+            <Loading placement="center" icon="dots" />
+          ) : (
+            <Empty message={t(messages.noResultsFound)} />
+          )
+        }
+      >
+        {properties.map(p => (
+          <ListItem key={p} id={p}>
+            {p}
+          </ListItem>
+        ))}
+      </ComboBox>
+    </>
   );
 }
 
@@ -99,7 +105,8 @@ function ValueSelect({
   onChange?: (value: string) => void;
 }) {
   const { get, useQuery } = useApi();
-  const { t, messages } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const hintId = useId();
   const { startAt, endAt } = getEventDataDateRange();
 
   const { data, isLoading } = useQuery<Array<{ value: string; total: number }>>({
@@ -117,27 +124,32 @@ function ValueSelect({
   const values: string[] = data?.map(d => d.value) ?? [];
 
   return (
-    <ComboBox
-      aria-label="ValueSelect"
-      items={values}
-      inputValue={value}
-      onInputValueChange={v => {
-        onChange?.(v);
-      }}
-      renderEmptyState={() =>
-        isLoading ? (
-          <Loading placement="center" icon="dots" />
-        ) : (
-          <Empty message={t(messages.noResultsFound)} />
-        )
-      }
-    >
-      {values.map(v => (
-        <ListItem key={v} id={v}>
-          {v}
-        </ListItem>
-      ))}
-    </ComboBox>
+    <>
+      <span id={hintId} hidden>
+        {t(messages.valueLookupHint)}
+      </span>
+      <ComboBox
+        inputProps={{ 'aria-label': t(labels.value), 'aria-describedby': hintId }}
+        items={values}
+        inputValue={value}
+        onInputValueChange={v => {
+          onChange?.(v);
+        }}
+        renderEmptyState={() =>
+          isLoading ? (
+            <Loading placement="center" icon="dots" />
+          ) : (
+            <Empty message={t(messages.noResultsFound)} />
+          )
+        }
+      >
+        {values.map(v => (
+          <ListItem key={v} id={v}>
+            {v}
+          </ListItem>
+        ))}
+      </ComboBox>
+    </>
   );
 }
 
@@ -149,13 +161,24 @@ function OperatorSelect({
   onChange?: (value: string) => void;
 }) {
   const { t, labels } = useMessages();
+  const choicesId = useId();
+  const choices = [labels.is, labels.isNot, labels.contains, labels.doesNotContain].map(l => t(l));
   return (
-    <Select value={value} onChange={v => onChange?.(v as string)}>
-      <ListItem id="eq">{t(labels.is)}</ListItem>
-      <ListItem id="neq">{t(labels.isNot)}</ListItem>
-      <ListItem id="c">{t(labels.contains)}</ListItem>
-      <ListItem id="dnc">{t(labels.doesNotContain)}</ListItem>
-    </Select>
+    <>
+      <span id={choicesId} hidden>
+        {`${t(labels.choices)}: ${choices.join(', ')}`}
+      </span>
+      <Select
+        value={value}
+        onChange={v => onChange?.(v as string)}
+        buttonProps={{ 'aria-label': t(labels.operator), 'aria-describedby': choicesId }}
+      >
+        <ListItem id="eq">{t(labels.is)}</ListItem>
+        <ListItem id="neq">{t(labels.isNot)}</ListItem>
+        <ListItem id="c">{t(labels.contains)}</ListItem>
+        <ListItem id="dnc">{t(labels.doesNotContain)}</ListItem>
+      </Select>
+    </>
   );
 }
 
@@ -201,7 +224,7 @@ export function EventDataFilterRow({
             <ValueSelect websiteId={websiteId} eventName={eventName} propertyName={propertyName} />
           </FormField>
         </Column>
-        <Button onPress={onRemove}>
+        <Button onPress={onRemove} aria-label={t(labels.removeFilter)}>
           <Icon size="sm">
             <X />
           </Icon>
@@ -234,7 +257,7 @@ export function EventDataFilterRow({
           <ValueSelect websiteId={websiteId} eventName={eventName} propertyName={propertyName} />
         </FormField>
       </Column>
-      <Button onPress={onRemove}>
+      <Button onPress={onRemove} aria-label={t(labels.removeFilter)}>
         <Icon size="sm">
           <X />
         </Icon>

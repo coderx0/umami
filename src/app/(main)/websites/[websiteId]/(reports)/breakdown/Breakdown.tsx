@@ -27,7 +27,7 @@ export function Breakdown({ websiteId, selectedFields = [], startDate, endDate }
   return (
     <LoadingPanel data={data} isLoading={isLoading} error={error}>
       <Column overflow="auto" minHeight="0" height="100%">
-        <DataTable data={data} style={{ tableLayout: 'fixed' }}>
+        <DataTable data={data} style={{ tableLayout: 'fixed' }} aria-label={t(labels.breakdown)}>
           {selectedFields.map(field => {
             return (
               <DataColumn

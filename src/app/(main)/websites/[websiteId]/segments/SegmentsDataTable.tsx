@@ -1,9 +1,10 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useWebsiteSegmentsQuery } from '@/components/hooks';
+import { useMessages, useWebsiteSegmentsQuery } from '@/components/hooks';
 import { SegmentAddButton } from './SegmentAddButton';
 import { SegmentsTable } from './SegmentsTable';
 
 export function SegmentsDataTable({ websiteId }: { websiteId?: string }) {
+  const { t, messages } = useMessages();
   const query = useWebsiteSegmentsQuery(websiteId, { type: 'segment' });
 
   const renderActions = () => {
@@ -14,6 +15,7 @@ export function SegmentsDataTable({ websiteId }: { websiteId?: string }) {
     <DataGrid
       query={query}
       allowSearch={true}
+      searchDescription={t(messages.segmentsSearchRule)}
       autoFocus={false}
       allowPaging={true}
       renderActions={renderActions}

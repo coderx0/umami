@@ -25,7 +25,7 @@ export function GoalEditForm({
   onSave?: () => void;
   onClose?: () => void;
 }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
   const { isMobile } = useMobile();
   const { data } = useGoalDefinitionQuery(websiteId, id);
   const { mutateAsync, error, isPending, touch } = useUpdateQuery(
@@ -55,14 +55,19 @@ export function GoalEditForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={error?.message} defaultValues={data || defaultValues}>
+    <Form
+      onSubmit={handleSubmit}
+      error={error?.message}
+      defaultValues={data || defaultValues}
+      aria-label={t(labels.goal)}
+    >
       {({ watch }) => {
         const type = watch('parameters.type');
 
         return (
           <>
             <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-              <TextField autoFocus />
+              <TextField autoFocus aria-required />
             </FormField>
             <Column gap="1">
               <Label>{t(labels.action)}</Label>
@@ -78,6 +83,8 @@ export function GoalEditForm({
                           websiteId={websiteId}
                           type={type}
                           allowCustomValue
+                          matchHint={t(messages.valueMatchHint)}
+                          aria-required
                           {...field}
                         />
                       );
@@ -99,6 +106,8 @@ export function GoalEditForm({
                             websiteId={websiteId}
                             type={type}
                             allowCustomValue
+                            matchHint={t(messages.valueMatchHint)}
+                            aria-required
                             {...field}
                           />
                         );

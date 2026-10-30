@@ -91,7 +91,10 @@ export function SessionDataPivotTable({
     <DataTable data={tableQuery?.data} style={{ width: '100%' }} displayMode={displayMode}>
       <DataColumn id="session" label={t(labels.session)} width="72px">
         {(row: any) => (
-          <Link href={updateParams({ session: row.sessionId })}>
+          <Link
+            href={updateParams({ session: row.sessionId })}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)}`}
+          >
             <Avatar seed={row.sessionId} size={32} />
           </Link>
         )}

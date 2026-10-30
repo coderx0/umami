@@ -37,7 +37,35 @@ export function WeeklyTraffic({ websiteId }: { websiteId: string }) {
 
   return (
     <LoadingPanel data={data} isLoading={isLoading} error={error}>
-      <Grid columns="repeat(8, 1fr)" gap>
+      {/* the grid is visual only; the same counts as a table (guidelines 3.4, 1.6) */}
+      {data && (
+        <table className="sr-only">
+          <caption>{t(labels.visitorsByDayAndHour)}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{t(labels.hour)}</th>
+              {daysOfWeek.map((index: number) => (
+                <th key={index} scope="col">
+                  {format(getDayOfWeekAsDate(index), 'EEEE', { locale: dateLocale })}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 24 }, (_, hour) => (
+              <tr key={hour}>
+                <th scope="row">
+                  {format(addHours(startOfDay(new Date()), hour), 'haaa', { locale: dateLocale })}
+                </th>
+                {daysOfWeek.map((index: number) => (
+                  <td key={index}>{data[index]?.[hour] ?? 0}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <Grid columns="repeat(8, 1fr)" gap data-agentom-ignore="" aria-hidden="true">
         {data && (
           <>
             <Row>&nbsp;</Row>

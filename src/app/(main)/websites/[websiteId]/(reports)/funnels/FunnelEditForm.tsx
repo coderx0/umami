@@ -14,7 +14,7 @@ import {
   Text,
   TextField,
 } from '@umami/react-zen';
-import { Fragment, useState } from 'react';
+import { Fragment, useId, useState } from 'react';
 import {
   useApi,
   useFunnelDefinitionQuery,
@@ -40,7 +40,7 @@ function StepRow({
   initialEventName?: string;
   onRemove: () => void;
 }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
   const { isMobile } = useMobile();
   const { get, useQuery } = useApi();
   const [eventName, setEventName] = useState(initialEventName ?? '');
@@ -68,6 +68,8 @@ function StepRow({
             websiteId={websiteId}
             type={type}
             allowCustomValue
+            matchHint={t(messages.valueMatchHint)}
+            aria-required
             {...field}
             onValueChange={(v: string) => {
               setEventName(v);
@@ -78,8 +80,9 @@ function StepRow({
     </FormField>
   );
 
+  // each step a group named by its number, so its fields are told apart (guidelines 1.12)
   return (
-    <Column gap>
+    <Column gap role="group" aria-label={t(labels.stepNumber, { number: index + 1 })}>
       {isMobile ? (
         <Grid columns="1fr auto" gap alignItems="start">
           <Column gap>
@@ -88,7 +91,7 @@ function StepRow({
             </FormField>
             {valueField}
           </Column>
-          <Button onPress={onRemove}>
+          <Button onPress={onRemove} aria-label={t(labels.removeStep, { number: index + 1 })}>
             <Icon size="sm">
               <X />
             </Icon>
@@ -102,7 +105,7 @@ function StepRow({
             </FormField>
           </Column>
           <Column>{valueField}</Column>
-          <Button onPress={onRemove}>
+          <Button onPress={onRemove} aria-label={t(labels.removeStep, { number: index + 1 })}>
             <Icon size="sm">
               <X />
             </Icon>
@@ -165,7 +168,8 @@ export function FunnelEditForm({
   onSave?: () => void;
   onClose?: () => void;
 }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const windowHintId = useId();
   const { data, isLoading } = useFunnelDefinitionQuery(websiteId, id);
   const { mutateAsync, error, isPending, touch } = useUpdateQuery(
     `/websites/${websiteId}/funnels${id ? `/${id}` : ''}`,
@@ -204,9 +208,14 @@ export function FunnelEditForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={error?.message} defaultValues={defaultValues}>
+    <Form
+      onSubmit={handleSubmit}
+      error={error?.message}
+      defaultValues={defaultValues}
+      aria-label={t(labels.funnel)}
+    >
       <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-        <TextField autoFocus />
+        <TextField autoFocus aria-required />
       </FormField>
       <FormField
         name="window"
@@ -219,8 +228,11 @@ export function FunnelEditForm({
           },
         }}
       >
-        <TextField />
+        <TextField aria-describedby={windowHintId} aria-required />
       </FormField>
+      <span id={windowHintId} hidden>
+        {t(messages.funnelWindowHint)}
+      </span>
       <FormFieldArray
         name="steps"
         label={t(labels.steps)}
@@ -253,7 +265,7 @@ export function FunnelEditForm({
                   <Icon>
                     <Plus />
                   </Icon>
-                  <Text>{t(labels.add)}</Text>
+                  <Text>{t(labels.addStep)}</Text>
                 </Button>
               </Row>
             </Grid>

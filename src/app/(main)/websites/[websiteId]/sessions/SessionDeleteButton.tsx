@@ -1,5 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
+import { useId } from 'react';
 import { ConfirmationForm } from '@/components/common/ConfirmationForm';
 import { useDeleteQuery, useMessages } from '@/components/hooks';
 import { Trash } from '@/components/icons';
@@ -26,6 +27,7 @@ export function SessionDeleteButton({
 }) {
   const queryClient = useQueryClient();
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const confirmId = useId();
   const { mutateAsync, isPending, error, touch } = useDeleteQuery(
     `/websites/${websiteId}/sessions/${sessionId}`,
   );
@@ -48,25 +50,33 @@ export function SessionDeleteButton({
   };
 
   return (
-    <DialogButton
-      aria-label={t(labels.delete)}
-      data-test="button-delete-session"
-      icon={<Trash />}
-      title={t(labels.confirm)}
-      variant="quiet"
-      width="400px"
-    >
-      {({ close }) => (
-        <ConfirmationForm
-          message={t(messages.confirmDelete, { target: t(labels.session) })}
-          isLoading={isPending}
-          error={getErrorMessage(error)}
-          onConfirm={handleConfirm.bind(null, close)}
-          onClose={close}
-          buttonLabel={t(labels.delete)}
-          buttonVariant="danger"
-        />
-      )}
-    </DialogButton>
+    <>
+      {/* what it asks before deleting (it opens a confirmation, guidelines 1.16) */}
+      <span id={confirmId} hidden>
+        {t(messages.confirmDelete, { target: t(labels.session) })}
+      </span>
+      <DialogButton
+        aria-label={t(labels.delete)}
+        aria-describedby={confirmId}
+        data-agentom-id="session.delete"
+        data-test="button-delete-session"
+        icon={<Trash />}
+        title={t(labels.confirm)}
+        variant="quiet"
+        width="400px"
+      >
+        {({ close }) => (
+          <ConfirmationForm
+            message={t(messages.confirmDelete, { target: t(labels.session) })}
+            isLoading={isPending}
+            error={getErrorMessage(error)}
+            onConfirm={handleConfirm.bind(null, close)}
+            onClose={close}
+            buttonLabel={t(labels.delete)}
+            buttonVariant="danger"
+          />
+        )}
+      </DialogButton>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Column, Label, Row, Text, TextField } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useMessages, useNavigation } from '@/components/hooks';
 import { ListFilter } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
@@ -20,13 +20,7 @@ function getMinDurationValue(value: unknown) {
   return Number(value) > 0 ? value : DEFAULT_MIN_DURATION;
 }
 
-function ReplayFilterForm({
-  minDuration,
-  onClose,
-}: {
-  minDuration: string;
-  onClose?: () => void;
-}) {
+function ReplayFilterForm({ minDuration, onClose }: { minDuration: string; onClose?: () => void }) {
   const { t, labels, messages } = useMessages();
   const { router, updateParams } = useNavigation();
   const [value, setValue] = useState(minDuration);
@@ -87,10 +81,24 @@ export function ReplayFilterButton() {
   const minDuration = getMinDurationValue(query.minDuration);
   const title = `${t(labels.replay)} ${t(labels.filter)}`;
   const label = minDuration ? `${title} (${minDuration}s+)` : title;
+  const hintId = useId();
 
   return (
-    <DialogButton icon={<ListFilter />} label={label} title={title} variant="outline">
-      {({ close }) => <ReplayFilterForm minDuration={minDuration} onClose={close} />}
-    </DialogButton>
+    <>
+      {/* what it asks for (guidelines 1.16); its label shows the value, so its id is pinned (2.4) */}
+      <span id={hintId} hidden>
+        {t(labels.minDurationSeconds)}
+      </span>
+      <DialogButton
+        icon={<ListFilter />}
+        label={label}
+        title={title}
+        variant="outline"
+        aria-describedby={hintId}
+        data-agentom-id="filter.replay"
+      >
+        {({ close }) => <ReplayFilterForm minDuration={minDuration} onClose={close} />}
+      </DialogButton>
+    </>
   );
 }

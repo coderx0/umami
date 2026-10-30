@@ -41,6 +41,7 @@ export function WebsiteTrackingCode({
         isReadOnly
         allowCopy
         asTextArea
+        aria-label={t(labels.trackingCode)}
         resize="none"
         className="code-textarea"
       />

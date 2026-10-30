@@ -32,7 +32,7 @@ export function LoadingPanel({
   // Show loading spinner only if no data exists
   if (isLoading || isFetching) {
     return (
-      <Column position="relative" height="100%" width="100%" {...props}>
+      <Column position="relative" height="100%" width="100%" aria-busy {...props}>
         <Loading icon={loadingIcon} placement={loadingPlacement} />
       </Column>
     );

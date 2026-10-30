@@ -32,8 +32,7 @@ export function WebsiteSparkline({
     return values
       .map((value, index) => {
         const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width;
-        const y =
-          height - padding - ((value - min) / range) * Math.max(height - padding * 2, 1);
+        const y = height - padding - ((value - min) / range) * Math.max(height - padding * 2, 1);
 
         return `${x},${y}`;
       })
@@ -56,13 +55,15 @@ export function WebsiteSparkline({
 
   return (
     <div style={{ width: '100%', maxWidth: 88, cursor: 'default' }} title={tooltipLabel}>
+      {/* the figure as the cell's text; the drawing is visual only (guidelines 3.4, 1.6) */}
+      <span className="sr-only">{tooltipLabel}</span>
       <svg
         width="100%"
         height="24"
         viewBox="0 0 96 24"
         preserveAspectRatio="none"
-        role="img"
-        aria-label={tooltipLabel}
+        aria-hidden="true"
+        data-agentom-ignore=""
         style={{ display: 'block' }}
       >
         <polyline

@@ -22,6 +22,13 @@ export function SessionsTable({
               getSessionHref ? getSessionHref(row) : `/websites/${websiteId}/sessions/${row.id}`
             }
             scroll={getSessionHref ? false : undefined}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)} ${[
+              row.city,
+              formatValue(row.country, 'country'),
+            ]
+              .filter(Boolean)
+              .join(', ')}`}
+            data-agentom-id={`session.${row.id}.open`}
           >
             <Avatar seed={row.id} size={32} />
           </Link>

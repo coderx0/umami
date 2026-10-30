@@ -1,17 +1,6 @@
-import {
-  AlertDialog,
-  Button,
-  Icon,
-  Menu,
-  MenuItem,
-  MenuTrigger,
-  Modal,
-  Popover,
-  Row,
-  Text,
-} from '@umami/react-zen';
-import { type ReactNode, useState } from 'react';
-import { ControlledDialog } from '@/components/common/ControlledDialog';
+import { Button, Icon, Menu, MenuItem, MenuTrigger, Popover, Text } from '@umami/react-zen';
+import { type ReactNode, useId, useState } from 'react';
+import { ConfirmationForm } from '@/components/common/ConfirmationForm';
 import { useMessages } from '@/components/hooks';
 import { useDeleteQuery } from '@/components/hooks/queries/useDeleteQuery';
 import { Edit, MoreHorizontal, Trash } from '@/components/icons';
@@ -42,10 +31,13 @@ export function SavedDefinitionEditButton({
   onDelete?: () => void;
   children: ({ close }: { close: () => void }) => ReactNode;
 }) {
-  const { t, labels, messages } = useMessages();
+  const { t, labels, messages, getErrorMessage } = useMessages();
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const { mutateAsync, touch } = useDeleteQuery(`/websites/${websiteId}/${type}s/${id}`);
+  const { mutateAsync, isPending, error, touch } = useDeleteQuery(
+    `/websites/${websiteId}/${type}s/${id}`,
+  );
+  const choicesId = useId();
 
   const handleAction = (id: any) => {
     if (id === 'edit') {
@@ -72,8 +64,17 @@ export function SavedDefinitionEditButton({
 
   return (
     <>
+      {/* what the menu offers, named before it opens (guidelines 1.16) */}
+      <span id={choicesId} hidden>
+        {`${t(labels.actions)}: ${t(labels.edit)}, ${t(labels.delete)}`}
+      </span>
       <MenuTrigger>
-        <Button variant="quiet">
+        <Button
+          variant="quiet"
+          aria-label={`${t(labels.actions)}: ${name}`}
+          aria-describedby={choicesId}
+          data-agentom-id={`${type}.${id}.actions`}
+        >
           <Icon>
             <MoreHorizontal />
           </Icon>
@@ -106,18 +107,25 @@ export function SavedDefinitionEditButton({
       >
         {children}
       </DialogButton>
-      <ControlledDialog>
-        <Modal isOpen={showDelete} onOpenChange={open => !open && handleClose()}>
-          <AlertDialog
-            title={t(labels.delete)}
+      {/* a confirmation whose button is marked destructive (guidelines 4.1) */}
+      <DialogButton
+        isOpen={showDelete}
+        onOpenChange={open => !open && handleClose()}
+        title={t(labels.delete)}
+        width="400px"
+      >
+        {() => (
+          <ConfirmationForm
+            message={t(messages.confirmDelete, { target: name })}
+            isLoading={isPending}
+            error={getErrorMessage(error)}
             onConfirm={handleDelete}
-            onCancel={handleClose}
-            isDanger
-          >
-            <Row gap="1">{t(messages.confirmDelete, { target: name })}</Row>
-          </AlertDialog>
-        </Modal>
-      </ControlledDialog>
+            onClose={handleClose}
+            buttonLabel={t(labels.delete)}
+            buttonVariant="danger"
+          />
+        )}
+      </DialogButton>
     </>
   );
 }

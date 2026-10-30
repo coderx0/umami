@@ -1,5 +1,6 @@
 import { Icon, Row, type RowProps, Text } from '@umami/react-zen';
 import type { ReactNode } from 'react';
+import { useMessages } from '@/components/hooks';
 import { ArrowRight } from '@/components/icons';
 
 const STYLES = {
@@ -35,6 +36,7 @@ export function ChangeLabel({
   const negative = value < 0;
   const neutral = value === 0 || Number.isNaN(value);
   const good = reverseColors ? negative : positive;
+  const { t, labels } = useMessages();
 
   const style =
     STYLES[good && 'positive'] || STYLES[!good && 'negative'] || STYLES[neutral && 'neutral'];
@@ -54,6 +56,10 @@ export function ChangeLabel({
           <ArrowRight />
         </Icon>
       )}
+      {/* the direction in words, not only the arrow and colour (guidelines 1.4) */}
+      <span className="sr-only">
+        {neutral ? t(labels.noChange) : positive ? t(labels.changeUp) : t(labels.changeDown)}{' '}
+      </span>
       <Text>{children || value}</Text>
     </Row>
   );

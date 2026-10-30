@@ -1,10 +1,12 @@
 import { colord } from 'colord';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BarChart, type BarChartProps } from '@/components/charts/BarChart';
+import { ChartDataTable } from '@/components/charts/ChartDataTable';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import {
   useDateRange,
   useLocale,
+  useMessages,
   useTimezone,
   useWebsiteEventsSeriesQuery,
 } from '@/components/hooks';
@@ -25,6 +27,7 @@ export function EventsChart({ websiteId, focusLabel, limit }: EventsChartProps) 
     dateRange: { startDate, endDate, unit },
   } = useDateRange({ timezone: timezone });
   const { locale, dateLocale } = useLocale();
+  const { t, labels } = useMessages();
   const { data, isLoading, error } = useWebsiteEventsSeriesQuery(websiteId, { limit });
   const [label, setLabel] = useState<string>(focusLabel);
   const [hiddenLabels, setHiddenLabels] = useState<Set<string>>(() => new Set());
@@ -110,17 +113,26 @@ export function EventsChart({ websiteId, focusLabel, limit }: EventsChartProps) 
   return (
     <LoadingPanel isLoading={isLoading} error={error} minHeight="400px">
       {chartData && (
-        <BarChart
-          chartData={chartData}
-          minDate={startDate}
-          maxDate={endDate}
+        <ChartDataTable
+          caption={t(labels.eventsOverTime)}
+          datasets={chartData.datasets}
           unit={unit}
-          stacked={true}
-          renderXLabel={renderXLabel}
-          height="400px"
-          hiddenLabels={hiddenLabels}
-          onLegendClick={handleLegendClick}
         />
+      )}
+      {chartData && (
+        <div data-agentom-ignore="" aria-hidden="true">
+          <BarChart
+            chartData={chartData}
+            minDate={startDate}
+            maxDate={endDate}
+            unit={unit}
+            stacked={true}
+            renderXLabel={renderXLabel}
+            height="400px"
+            hiddenLabels={hiddenLabels}
+            onLegendClick={handleLegendClick}
+          />
+        </div>
       )}
     </LoadingPanel>
   );

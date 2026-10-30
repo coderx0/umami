@@ -69,6 +69,11 @@ vi.mock('@/components/hooks', () => ({
       steps: 'Steps',
       startStep: 'Start Step',
       endStep: 'End Step',
+      choices: 'Choices',
+    },
+    messages: {
+      journeyStartHint: 'Start step hint',
+      journeyEndHint: 'End step hint',
     },
   }),
 }));
@@ -118,9 +123,15 @@ vi.mock('@/components/input/WebsiteValueComboBox', () => ({
   }) => (
     <label>
       {label}
-      <select aria-label={label} value={value} onChange={event => onChange(event.currentTarget.value)}>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={event => onChange(event.currentTarget.value)}
+      >
         <option value="" />
-        {value && !mockValues.some(item => item.value === value) && <option value={value}>{value}</option>}
+        {value && !mockValues.some(item => item.value === value) && (
+          <option value={value}>{value}</option>
+        )}
         {mockValues.map(({ value }) => (
           <option key={value} value={value}>
             {value}

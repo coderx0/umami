@@ -51,12 +51,24 @@ export function Pager({ page, pageSize, count, isCapped, onPageChange }: PagerPr
               })}
             </Text>
             <Row gap="1">
-              <Button variant="outline" onPress={() => handlePageChange(-1)} isDisabled={firstPage}>
+              <Button
+                variant="outline"
+                onPress={() => handlePageChange(-1)}
+                isDisabled={firstPage}
+                aria-label={t(labels.previousPage)}
+                data-agentom-id="list.previous-page"
+              >
                 <Icon size="sm" rotate={180}>
                   <ChevronRight />
                 </Icon>
               </Button>
-              <Button variant="outline" onPress={() => handlePageChange(1)} isDisabled={lastPage}>
+              <Button
+                variant="outline"
+                onPress={() => handlePageChange(1)}
+                isDisabled={lastPage}
+                aria-label={t(labels.nextPage)}
+                data-agentom-id="list.next-page"
+              >
                 <Icon size="sm">
                   <ChevronRight />
                 </Icon>

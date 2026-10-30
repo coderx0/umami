@@ -18,6 +18,8 @@ interface ListData {
 export interface ListTableProps {
   data?: ListData[];
   title?: string;
+  /** the table's name, when its title alone doesn't say which table it is */
+  label?: string;
   metric?: string;
   className?: string;
   renderLabel?: (data: ListData, index: number) => ReactNode;
@@ -32,6 +34,7 @@ export interface ListTableProps {
 export function ListTable({
   data = [],
   title,
+  label,
   metric,
   renderLabel,
   renderChange,
@@ -55,6 +58,7 @@ export function ListTable({
         percent={percent}
         animate={animate && !virtualize}
         showPercentage={showPercentage}
+        rowIndex={virtualize ? index + 2 : undefined}
         change={renderChange ? renderChange(row, index) : null}
         formatCount={formatCount}
         isPhone={isPhone}
@@ -66,20 +70,38 @@ export function ListTable({
     return <div style={style}>{getRow(data[index], index)}</div>;
   };
 
+  // A table to whatever reads it (guidelines 1.2, 1.7): the rows are named by their label,
+  // the columns are the title, the metric and the share.
   return (
-    <Column gap>
-      <Grid
-        alignItems="center"
-        justifyContent="space-between"
-        paddingLeft="2"
-        columns={'1fr 100px'}
-      >
-        <Text weight="bold">{title}</Text>
-        <Text weight="bold" align="center">
-          {metric}
-        </Text>
-      </Grid>
-      <Column gap="1">
+    <Column
+      gap
+      role="table"
+      aria-label={label ?? title}
+      aria-rowcount={virtualize ? data.length + 1 : undefined}
+    >
+      <div role="rowgroup">
+        <Grid
+          alignItems="center"
+          justifyContent="space-between"
+          paddingLeft="2"
+          columns={'1fr 100px'}
+          role="row"
+          aria-rowindex={virtualize ? 1 : undefined}
+        >
+          <Text weight="bold" role="columnheader">
+            {title}
+          </Text>
+          <Text weight="bold" align="center" role="columnheader">
+            {metric}
+          </Text>
+          {showPercentage && (
+            <span role="columnheader" className="sr-only">
+              {t(labels.shareOfTotal)}
+            </span>
+          )}
+        </Grid>
+      </div>
+      <Column gap="1" role="rowgroup">
         {data?.length === 0 && <Empty />}
         {virtualize && data.length > 0 ? (
           <List
@@ -107,6 +129,7 @@ const AnimatedRow = ({
   showPercentage = true,
   formatCount,
   isPhone,
+  rowIndex = undefined,
 }) => {
   const y = !Number.isNaN(value) ? value : 0;
   const ySpring = useSpring(0, { stiffness: 170, damping: 26 });
@@ -132,8 +155,10 @@ const AnimatedRow = ({
       borderRadius
       gap
       hover={{ backgroundColor: 'surface-sunken' }}
+      role="row"
+      aria-rowindex={rowIndex}
     >
-      <Row alignItems="center">
+      <Row alignItems="center" role="rowheader">
         <Text truncate={true} style={{ maxWidth: isPhone ? '200px' : '400px' }}>
           {label}
         </Text>
@@ -142,6 +167,7 @@ const AnimatedRow = ({
         alignItems="center"
         height="30px"
         justifyContent={showPercentage ? 'flex-end' : 'center'}
+        role="cell"
       >
         {change}
         <Text weight="bold">
@@ -157,6 +183,7 @@ const AnimatedRow = ({
           borderColor="strong"
           color="muted"
           paddingLeft="3"
+          role="cell"
         >
           <AnimatedDiv>{widthText}</AnimatedDiv>
         </Row>

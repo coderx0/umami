@@ -11,20 +11,21 @@ vi.mock('@umami/react-zen', () => ({
 }));
 
 vi.mock('@/components/common/ComboBox', () => ({
+  // as react-zen's: the input is named through inputProps
   ComboBox: ({
-    'aria-label': ariaLabel,
+    inputProps,
     inputValue,
     onInputValueChange,
     items,
   }: {
-    'aria-label'?: string;
+    inputProps?: { 'aria-label'?: string };
     inputValue: string;
     onInputValueChange: (value: string) => void;
     items: string[];
   }) => (
     <div>
       <input
-        aria-label={ariaLabel}
+        aria-label={inputProps?.['aria-label']}
         value={inputValue}
         onChange={event => onInputValueChange(event.currentTarget.value)}
       />
@@ -60,7 +61,7 @@ function TestLookupField() {
 test('offers a manually entered funnel value as a selectable option', () => {
   render(<TestLookupField />);
 
-  fireEvent.change(screen.getByLabelText('LookupField'), { target: { value: '/blog/*' } });
+  fireEvent.change(screen.getByLabelText('path'), { target: { value: '/blog/*' } });
 
   expect(screen.getByText('/blog/*')).toBeInTheDocument();
 });

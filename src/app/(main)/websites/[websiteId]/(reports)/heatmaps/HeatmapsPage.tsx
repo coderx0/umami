@@ -1,6 +1,6 @@
 'use client';
 import { Button, Column, Loading, Row, SearchField } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { WebsiteControls } from '@/app/(main)/websites/[websiteId]/WebsiteControls';
 import { EmptyPlaceholder } from '@/components/common/EmptyPlaceholder';
 import { Panel } from '@/components/common/Panel';
@@ -20,6 +20,7 @@ export function HeatmapsPage({ websiteId }: { websiteId: string }) {
   const { isPhone } = useMobile();
   const website = useWebsite();
   const { t, labels, messages } = useMessages();
+  const searchHintId = useId();
   const { hasFeature, cloudMode, isLoading } = useSubscription(website?.teamId);
 
   const buttons = [
@@ -54,6 +55,10 @@ export function HeatmapsPage({ websiteId }: { websiteId: string }) {
 
   return (
     <Column gap>
+      {/* what the search matches (guidelines 1.15) */}
+      <span id={searchHintId} hidden>
+        {t(messages.heatmapPagesSearchRule)}
+      </span>
       <WebsiteControls websiteId={websiteId} />
       <Panel
         minHeight="900px"
@@ -72,6 +77,7 @@ export function HeatmapsPage({ websiteId }: { websiteId: string }) {
                     onSearch={setSearch}
                     placeholder="Search"
                     className="w-full max-w-md"
+                    aria-describedby={searchHintId}
                   />
                 </Row>
                 <Row justifyContent="flex-end">
@@ -89,6 +95,7 @@ export function HeatmapsPage({ websiteId }: { websiteId: string }) {
                   onSearch={setSearch}
                   placeholder="Search"
                   className="w-full max-w-md"
+                  aria-describedby={searchHintId}
                 />
                 <FilterButtons
                   items={buttons}

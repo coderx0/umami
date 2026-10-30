@@ -1,5 +1,5 @@
 import { Column, Heading, Row, SearchField, Text } from '@umami/react-zen';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { List, type RowComponentProps } from 'react-window';
 import { SessionModal } from '@/app/(main)/websites/[websiteId]/sessions/SessionModal';
 import { Avatar } from '@/components/common/Avatar';
@@ -43,6 +43,8 @@ export function RealtimeLog({ data }: { data: any }) {
   const { formatTimezoneDate } = useTimezone();
   const { countryNames } = useCountryNames(locale);
   const [filter, setFilter] = useState(TYPE_ALL);
+  const searchHintId = useId();
+  const shownId = useId();
   const { updateParams } = useNavigation();
   const { isPhone } = useMobile();
 
@@ -115,7 +117,8 @@ export function RealtimeLog({ data }: { data: any }) {
     if (__type === TYPE_SESSION) {
       return t.rich(messages.visitorLog, {
         country: countryNames[country] || t(labels.unknown),
-        browser: BROWSERS[browser],
+        // the name, or Umami's formatting of it when the table has none (the sentence lost the word)
+        browser: BROWSERS[browser] || formatValue(browser, 'browser'),
         os: OS_NAMES[os] || os,
         device: t(labels[device] || labels.unknown),
         b: chunks => <b>{chunks}</b>,
@@ -126,9 +129,19 @@ export function RealtimeLog({ data }: { data: any }) {
   const TableRow = ({ index, style, logs }: RowComponentProps<{ logs: any[] }>) => {
     const row = logs[index];
     return (
-      <Row alignItems="center" style={{ ...style, minWidth: 0 }} gap>
+      <Row
+        alignItems="center"
+        style={{ ...style, minWidth: 0 }}
+        gap
+        role="listitem"
+        aria-setsize={logs.length}
+        aria-posinset={index + 1}
+      >
         <Row minWidth="30px">
-          <Link href={updateParams({ session: row.sessionId })}>
+          <Link
+            href={updateParams({ session: row.sessionId })}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)} ${getTime(row)}`}
+          >
             <Avatar seed={row.sessionId} size={32} />
           </Link>
         </Row>
@@ -186,6 +199,7 @@ export function RealtimeLog({ data }: { data: any }) {
               onSearch={setSearch}
               placeholder={t(labels.search)}
               className="w-full max-w-md"
+              aria-describedby={searchHintId}
             />
           </Row>
           <Row>
@@ -199,15 +213,35 @@ export function RealtimeLog({ data }: { data: any }) {
             onSearch={setSearch}
             placeholder={t(labels.search)}
             className="w-full max-w-md"
+            aria-describedby={searchHintId}
           />
           <FilterButtons items={buttons} value={filter} onChange={setFilter} />
         </Row>
       )}
 
+      {/* what the search matches (guidelines 1.15), and which entries are shown (1.14) */}
+      <span id={searchHintId} hidden>
+        {t(messages.activitySearchRule)}
+      </span>
+      <span id={shownId} hidden>
+        {[
+          t(messages.listStatus, {
+            start: logs.length ? 1 : 0,
+            end: logs.length.toLocaleString(),
+            count: logs.length.toLocaleString(),
+          }),
+          search && t(messages.listStatusSearch, { search }),
+        ]
+          .filter(Boolean)
+          .join(', ')}
+      </span>
       <Column gap="3">
         {logs?.length === 0 && <Empty />}
         {logs.length > 0 && (
           <List
+            role="list"
+            aria-label={t(labels.activity)}
+            aria-describedby={shownId}
             rowComponent={TableRow}
             rowCount={logs.length}
             rowHeight={ROW_HEIGHT}

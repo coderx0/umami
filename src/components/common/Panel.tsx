@@ -67,14 +67,24 @@ export function Panel({
           {toolbar}
           {allowFullscreen &&
             (isFullscreen ? (
-              <Button size="sm" variant="quiet" onPress={handleFullscreen}>
+              <Button
+                size="sm"
+                variant="quiet"
+                onPress={handleFullscreen}
+                aria-label={t(labels.close)}
+              >
                 <Icon>
                   <X />
                 </Icon>
               </Button>
             ) : (
               <TooltipTrigger delay={0}>
-                <Button size="sm" variant="quiet" onPress={handleFullscreen}>
+                <Button
+                  size="sm"
+                  variant="quiet"
+                  onPress={handleFullscreen}
+                  aria-label={t(labels.maximize)}
+                >
                   <Icon>
                     <Maximize />
                   </Icon>

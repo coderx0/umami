@@ -46,8 +46,9 @@ export function Goal({
   });
   const isPage = parameters?.type === 'path';
 
+  // a group named by the goal, so its figures are read as that goal's (guidelines 1.12)
   return (
-    <Grid gap>
+    <Grid gap role="group" aria-label={name}>
       <Grid columns="1fr auto" gap>
         <Column gap>
           <Row>
@@ -89,10 +90,13 @@ export function Goal({
             <Text title={`${data?.num} / ${data?.total}`}>{`${formatLongNumber(
               data?.num,
             )} / ${formatLongNumber(data?.total)}`}</Text>
+            {/* what the figures count, which the icon only shows (guidelines 1.4) */}
+            <span className="sr-only">{t(labels.visitors)}</span>
           </Row>
         </Row>
         <Row alignItems="center" gap="6">
           <ProgressBar
+            aria-label={t(labels.conversionRate)}
             value={data?.num || 0}
             min={0}
             max={data?.total || 1}

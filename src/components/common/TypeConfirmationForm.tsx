@@ -42,11 +42,17 @@ export function TypeConfirmationForm({
         name="confirm"
         rules={{ validate: value => value === confirmationValue }}
       >
-        <TextField autoComplete="off" />
+        <TextField autoComplete="off" aria-required />
       </FormField>
       <FormButtons>
         <Button onPress={onClose}>{t(labels.cancel)}</Button>
-        <FormSubmitButton isLoading={isLoading} variant={buttonVariant}>
+        {/* every use resets or deletes something (guidelines 4.1) */}
+        <FormSubmitButton
+          isLoading={isLoading}
+          variant={buttonVariant}
+          data-agentom-id="confirmation.confirm"
+          data-agentom-risk="destructive"
+        >
           {buttonLabel || t(labels.ok)}
         </FormSubmitButton>
       </FormButtons>

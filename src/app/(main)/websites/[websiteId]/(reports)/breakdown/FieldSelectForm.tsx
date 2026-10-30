@@ -41,7 +41,12 @@ export function FieldSelectForm({
   return (
     <Column gap="6">
       <Column gap="3" overflowY="auto" maxHeight="400px">
-        <List value={selected} onChange={handleChange} selectionMode="multiple">
+        <List
+          value={selected}
+          onChange={handleChange}
+          selectionMode="multiple"
+          aria-label={t(labels.fields)}
+        >
           {groupLabels.map(({ key: groupKey, label }) => {
             const groupFields = groupedFields[groupKey];
             return (
