@@ -37,6 +37,7 @@ export function BoardEditRow({
 }) {
   const { board, updateBoard } = useBoard();
   const [showActions, setShowActions] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
   const moveUpDisabled = rowIndex === 0;
   const addColumnDisabled = columns.length >= MAX_COLUMNS;
   const moveDownDisabled = rowIndex === rowCount - 1;
@@ -85,11 +86,19 @@ export function BoardEditRow({
   };
 
   return (
+    // The actions stay rendered, shown on hover and on keyboard focus: what's
+    // only rendered on mouseenter, neither a keyboard nor an agent can reach.
     <Box
       position="relative"
       height="100%"
+      role="group"
+      aria-label={`Row ${rowIndex + 1}`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
+      onFocus={() => setHasFocus(true)}
+      onBlur={e => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setHasFocus(false);
+      }}
     >
       <Group groupRef={handleGroupRef}>
         {columns?.map((column, index) => (
@@ -136,7 +145,7 @@ export function BoardEditRow({
           </Fragment>
         ))}
       </Group>
-      {canEdit && showActions && (
+      {canEdit && (
         <Column
           padding="2"
           gap="1"
@@ -146,12 +155,16 @@ export function BoardEditRow({
           zIndex={20}
           backgroundColor="surface-sunken"
           borderRadius
-          style={{ transform: 'translateY(-50%)' }}
+          style={{
+            transform: 'translateY(-50%)',
+            opacity: showActions || hasFocus ? 1 : 0,
+          }}
         >
           <TooltipTrigger delay={0}>
             <Button
               variant="outline"
               onPress={() => onMoveUp(rowId)}
+              aria-label="Move row up"
               isDisabled={moveUpDisabled}
               style={moveUpDisabled ? { pointerEvents: 'none' } : undefined}
             >
@@ -165,6 +178,7 @@ export function BoardEditRow({
             <Button
               variant="outline"
               onPress={handleAddColumn}
+              aria-label="Add column"
               isDisabled={addColumnDisabled}
               style={addColumnDisabled ? { pointerEvents: 'none' } : undefined}
             >
@@ -175,7 +189,7 @@ export function BoardEditRow({
             <Tooltip placement="left">Add column</Tooltip>
           </TooltipTrigger>
           <TooltipTrigger delay={0}>
-            <Button variant="outline" onPress={() => onRemove(rowId)}>
+            <Button variant="outline" onPress={() => onRemove(rowId)} aria-label="Remove row">
               <Icon>
                 <Minus />
               </Icon>
@@ -186,6 +200,7 @@ export function BoardEditRow({
             <Button
               variant="outline"
               onPress={() => onMoveDown(rowId)}
+              aria-label="Move row down"
               isDisabled={moveDownDisabled}
               style={moveDownDisabled ? { pointerEvents: 'none' } : undefined}
             >

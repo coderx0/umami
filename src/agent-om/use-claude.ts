@@ -5,10 +5,12 @@ import {
   indexNodes,
   presentedPage,
   StepFailed,
+  siteOutline,
 } from '@agent-om/agent';
 import { HAIKU, projectionView, runClaude } from '@agent-om/agent/claude';
 import type { SemanticProjector } from '@agent-om/core';
 import { useCallback, useRef, useState } from 'react';
+import { loadSitemap } from './load-sitemap';
 import { nodeResolver } from './projection';
 import { createTranscript, saveTranscript, secretFields, type Totals } from './transcript';
 
@@ -158,8 +160,13 @@ export function useClaude() {
     const page = presentedPage(projector, nodeResolver(projector));
     let result: AgentResult;
     try {
+      // the app's map, with where the run starts marked (../agent-om/docs/sitemap.md)
+      const sitemap = await loadSitemap(controller.signal);
+      const here = new URL(window.location.href);
       result = await runClaude({
         query,
+        siteOutline:
+          sitemap && siteOutline(sitemap, here.pathname, Object.fromEntries(here.searchParams)),
         apiKey: API_KEY,
         page: failFast(page, projector),
         exclude: EXCLUDE,

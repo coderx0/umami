@@ -1,0 +1,140 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
+import { type SitemapNode, validateSitemap } from '@agent-om/core/sitemap';
+
+// Umami's semantic sitemap (../agent-om/docs/sitemap.md), generated from the
+// pages in src/app: a page is a folder with a page.tsx. Run in Node by
+// scripts/semantic-sitemap.ts, which writes public/semantic-sitemap.json;
+// sitemap.test.ts fails when that file is behind the pages.
+//
+// - Route groups, `(main)`, are left out of the path; parallel routes,
+//   `@modal`, and everything in them are left out (they show a page that
+//   has its own route).
+// - `[param]` becomes `{param}`, `[...param]` and `[[...param]]` become `*`.
+// - A folder without a page isn't a page: what's below it sits under the
+//   nearest page above ("admin/users" under "/").
+// - A page's name is its metadata title, when that says more than its last
+//   segment ("{websiteId}" is "Overview"; "realtime" isn't "Real-time").
+
+const APP_DIR = join('src', 'app');
+
+/** What the pages can't say for themselves. */
+const DECLARED: {
+  hidden: string[];
+  names: Record<string, string>;
+  /** query params whose values select a view, read from where the app lists them */
+  views: Record<string, Record<string, { file: string; pattern: RegExp }>>;
+} = {
+  // not a place to go: signing out, signing in with a token, a developer
+  // page that's off unless ENABLE_TEST_CONSOLE is set, a page that only
+  // redirects, and the public share pages, reached only by their link
+  hidden: ['/logout', '/sso', '/console/{websiteId}', '/boards/create', '/share/{slug}/*'],
+  names: {
+    // titled "Teams", like the list it's under
+    '/settings/teams/{teamId}': 'Team',
+  },
+  views: {
+    '/websites/{websiteId}': {
+      view: {
+        file: 'src/app/(main)/websites/[websiteId]/WebsiteExpandedMenu.tsx',
+        pattern: /updateParams\(\{ view: '(\w+)' \}\)/g,
+      },
+    },
+    '/websites/{websiteId}/compare': {
+      view: {
+        file: 'src/app/(main)/websites/[websiteId]/compare/CompareTables.tsx',
+        pattern: /^\s+id: '(\w+)',$/gm,
+      },
+    },
+  },
+};
+
+type Page = { path: string; title?: string };
+
+function segmentOf(folder: string): string | null {
+  if (/^\(.*\)$/.test(folder)) return null; // a route group
+  const catchAll = folder.match(/^\[\[?\.\.\.(\w+)\]\]?$/);
+  if (catchAll) return '*';
+  const param = folder.match(/^\[(\w+)\]$/);
+  return param ? `{${param[1]}}` : folder;
+}
+
+/** Every page under src/app, by its path ("/websites/{websiteId}/events"). */
+export function findPages(root: string): Page[] {
+  const pages: Page[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        if (!entry.name.startsWith('@')) walk(join(dir, entry.name));
+      } else if (entry.name === 'page.tsx') {
+        const folders = relative(join(root, APP_DIR), dir).split(sep).filter(Boolean);
+        const segments = folders.map(segmentOf).filter((s): s is string => s !== null);
+        const source = readFileSync(join(dir, entry.name), 'utf8');
+        pages.push({
+          path: `/${segments.join('/')}`,
+          title: source.match(/title: '([^']+)'/)?.[1],
+        });
+      }
+    }
+  };
+  walk(join(root, APP_DIR));
+  return pages.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+const letters = (text: string) => text.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+function viewsOf(root: string, path: string) {
+  const declared = DECLARED.views[path];
+  if (!declared) return undefined;
+  return Object.fromEntries(
+    Object.entries(declared).map(([param, { file, pattern }]) => {
+      const source = readFileSync(join(root, file), 'utf8');
+      return [param, [...new Set([...source.matchAll(pattern)].map(m => m[1]))]];
+    }),
+  );
+}
+
+/** The map, from the pages under `root` (Umami's folder). */
+export function buildSitemap(root: string): SitemapNode {
+  const hidden = (path: string) =>
+    DECLARED.hidden.some(h => path === h || path.startsWith(`${h}/`));
+  const pages = findPages(root).filter(page => page.path !== '/' && !hidden(page.path));
+  const nodes = new Map<string, SitemapNode>();
+  const map: SitemapNode = { path: '/' };
+  nodes.set('/', map);
+
+  for (const page of pages) {
+    // the nearest page above it (pages are sorted, so it's already placed)
+    const segments = page.path.split('/').filter(Boolean);
+    let parent = '/';
+    for (let i = segments.length - 1; i > 0; i--) {
+      const above = `/${segments.slice(0, i).join('/')}`;
+      if (nodes.has(above)) {
+        parent = above;
+        break;
+      }
+    }
+    const last = segments[segments.length - 1];
+    const name =
+      DECLARED.names[page.path] ??
+      (page.title && letters(page.title) !== letters(last) ? page.title : undefined);
+    const views = viewsOf(root, page.path);
+    const node: SitemapNode = {
+      path: parent === '/' ? page.path.slice(1) : page.path.slice(parent.length + 1),
+      ...(name ? { name } : {}),
+      ...(views ? { views } : {}),
+    };
+    const parentNode = nodes.get(parent);
+    parentNode.children = [...(parentNode.children ?? []), node];
+    nodes.set(page.path, node);
+  }
+
+  const warnings = validateSitemap(map);
+  if (warnings.length) {
+    throw new Error(`The sitemap isn't valid:\n${warnings.map(w => w.message).join('\n')}`);
+  }
+  return map;
+}
+
+/** The file's content: stable, so it's rewritten only when the map changes. */
+export const sitemapJson = (map: SitemapNode) => `${JSON.stringify(map, null, 2)}\n`;

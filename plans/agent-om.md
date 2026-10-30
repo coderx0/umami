@@ -29,6 +29,12 @@ tarballs). Nothing goes into agent-om-exp.
 
 ## Setup (done)
 
+- The seed's data ages: "last 24 hours" is empty a day after seeding. On
+  2026-10-31 it was moved forward instead of reseeded (a reseed makes the
+  demo websites anew, with new ids, and drops their reports): `created_at` of
+  `website_event`, `session`, `event_data`, `session_data` and `revenue`
+  plus 1 day 01:53, so the latest event was the present. Subtracting the
+  same interval undoes it.
 - Postgres 15 in Docker: container `umami-db`, port 5432, volume
   `umami-db-data`. Umami's `.env` holds `DATABASE_URL`, `APP_SECRET` and
   `TWO_FACTOR_ENCRYPTION_KEY` (git-ignored).
@@ -177,18 +183,97 @@ the projection with the value on the page):
 - [x] `/admin/security`
 
 **Boards, links, pixels, console**
-- [ ] `/boards`, `/boards/create`, `/boards/[boardId]`, `/edit`, `/design`
-- [ ] `/links`, `/links/[linkId]`, `/links/[linkId]/edit`
-- [ ] `/pixels`, `/pixels/[pixelId]`, `/pixels/[pixelId]/edit`
-- [ ] `/console/[websiteId]`
+- [x] `/boards`, `/boards/create`, `/boards/[boardId]`, `/edit`, `/design`
+      (with the board editor, below; a board,
+      "Marketing overview", was created through the dialog; `/boards/create`
+      only sends you to `/boards`)
+- [x] `/links`, `/links/[linkId]`, `/links/[linkId]/edit` (a link, "Pricing
+      campaign", and a share link for it, "Public pricing stats", were
+      created through the dialogs)
+- [x] `/pixels`, `/pixels/[pixelId]`, `/pixels/[pixelId]/edit` (a pixel,
+      "Newsletter opens", was created through the dialog)
+- [x] `/console/[websiteId]`: skipped. A developer page that fires test
+      events, shown only with `ENABLE_TEST_CONSOLE`; without it, it renders
+      nothing.
 
-Public pages (`/share/[slug]`) come after the signed-in app, if wanted.
+A task in the chat on boards, links and pixels (2026-10-31): 11 tasks, all
+answered or done right, checked against the pages and the database; $0.011.
+Answered: the links and where one redirects, a pixel's address, what a board
+shows from top to bottom. Done: a link created and deleted (confirmed), a
+share link added to a link, a pixel renamed, a board created and deleted, a
+row with a Metrics bar added to a board and saved, then a row with a Goal
+added, moved above it with "Move row up" (rendered now, not only on hover)
+and saved. Slips it recovered from: an id that isn't on the page, and a
+`select` on a custom select. The figures read 0 because the seed's last event
+(2026-10-29 18:28 UTC) is now older than "last 24 hours".
 
-### 5. Sitemap
+The board editor (`/boards/[boardId]/design`, and `/dashboard/edit`, which
+uses the same editor; its two unnamed buttons were the editor's "Select
+component" and "Add row"): a row's move up and down, add column and remove
+row buttons, and a filled column's edit and remove buttons, are rendered only
+while the mouse is over the row or column (`onMouseEnter`). The agent can't
+hover (the executor has no hover, on purpose), and a keyboard user can't
+reach them either. Decided (2026-10-31): they stay rendered, shown on hover
+and on focus within, transparent otherwise; to a mouse user the editor looks
+as before. Each row is a group ("Row 1") and each column one named by its
+component ("Empty column" before one is chosen), so each button says which
+it acts on. agent-om's guidelines now say so (1.5's note on controls revealed
+on hover, and a "Pitfalls in real apps" entry).
 
-Generated from Next's `src/app/` routes (route groups dropped, dynamic
-segments as path templates), per `../agent-om/docs/sitemap.md`; checked with
-`validateSitemap`.
+Also: the component list in "Select component" was clickable rows with no
+role, so the agent couldn't choose a component; it's now a listbox, an option
+per component by group, the chosen one selected. The shares table
+(`SharedSharesTable`, also on the website settings page, which had no shares
+when checked) is an ARIA table, so each row's Edit and Delete say which share
+they act on.
+
+**Public share pages** (`/share/[slug]/[[...path]]`)
+- [x] a website's share ("Public demo", made through the website settings
+      dialog), a link's ("Team view") and a board's ("Board view"), each
+      checked signed out
+  - the share nav's links were `role="button"`: they're links now, in a
+    named `<nav>`, the current one `aria-current`
+  - the collapse toggle, the theme button, the language button (its
+    languages listed; the choices a radio group, the one in use checked)
+    and the preferences button are named and described
+
+Not yet done for the share pages: a task in the chat.
+
+### 5. Sitemap (done)
+
+Generated from Next's `src/app/` pages by `src/agent-om/sitemap.ts`
+(`pnpm build:sitemap` writes `public/semantic-sitemap.json`); checked with
+`validateSitemap`. Route groups and parallel routes (`@modal`) are left out,
+`[param]` is `{param}` and `[[...path]]` is `*`, a folder without a page folds
+into the page above (`admin/users` under `/`), and a page is named by its
+metadata title when that says more than its path (`{websiteId}: Overview`).
+Declared beside it: the hidden pages (logout, sso, the test console,
+`boards/create`, the share pages), one name (a settings team page is titled
+"Teams") and where the views are listed (the overview's `?view=`, 26 values
+from `WebsiteExpandedMenu`, and compare's, 20 from `CompareTables`).
+`src/agent-om/sitemap.test.ts` fails when the file is behind the pages.
+Linked from every page (`<link rel="semantic-sitemap">` in the root layout).
+The chat loads it from that link at the start of a run and gives Claude the
+outline (`siteOutline`), with where the run starts marked.
+
+Measured (2026-10-31): five tasks from `/dashboard`, each once with the map and
+once without (the request blocked); $0.024. Retention report, API keys page,
+an admin user page: the same 3 steps either way. The overview's full browser
+list: neither, as the "More" link that opens it shows only when the table has
+data, and the seed's data is now older than the last 24 hours; the map says
+the view exists, but nothing navigates by the map. Comparing countries with
+the previous period: with the map, right (Compare, last 7 days); without, it
+pressed "Previous period" first, which moves the dates back a period, and
+compared September with August. That was the button's name, not the map:
+"Previous period" (also a choice in Compare's menu) now says it moves the
+dates and that comparing is Compare's; rerun without the map, it was right.
+No difference the map made shows on pages the sidebar names, as in the
+dashboard's measurement (../agent-om/docs/sitemap.md section 6). After the
+data was moved forward (below), the browser list: right with the map and
+without, the same 3 steps (Websites, Demo SaaS, the panel's "More").
+
+Not done: hints (`holds`, what each page holds), by the crawler in
+../agent-om/eval/apps/harness/hints.ts.
 
 ## Notes
 
@@ -255,6 +340,10 @@ segments as path templates), per `../agent-om/docs/sitemap.md`; checked with
   package ships its source.
 - Next's dev indicator sits bottom right, over the chat's column; the
   composer leaves room for it.
+- A run that ends with a page dialog open (an expanded table on the
+  overview) leaves the chat column covered by the dialog's backdrop: Run and
+  Clear can't be pressed until the dialog closes (Escape). The chat's
+  questions are in the top layer and aren't affected.
 - Don't `git stash` (or otherwise swap package.json) here to compare with
   upstream: `pnpm exec` checks dependencies before running and prunes
   `@agent-om/*` when package.json doesn't list them. `pnpm install` brings

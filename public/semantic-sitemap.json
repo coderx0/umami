@@ -1,0 +1,267 @@
+{
+  "path": "/",
+  "children": [
+    {
+      "path": "admin/security"
+    },
+    {
+      "path": "admin/teams",
+      "children": [
+        {
+          "path": "{teamId}",
+          "name": "Team"
+        }
+      ]
+    },
+    {
+      "path": "admin/users",
+      "children": [
+        {
+          "path": "{userId}",
+          "name": "User"
+        }
+      ]
+    },
+    {
+      "path": "admin/websites",
+      "children": [
+        {
+          "path": "{websiteId}",
+          "name": "Website"
+        }
+      ]
+    },
+    {
+      "path": "boards",
+      "children": [
+        {
+          "path": "{boardId}",
+          "name": "Board",
+          "children": [
+            {
+              "path": "design",
+              "name": "Design Board"
+            },
+            {
+              "path": "edit",
+              "name": "Edit Board"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "dashboard",
+      "children": [
+        {
+          "path": "edit",
+          "name": "Edit Dashboard"
+        }
+      ]
+    },
+    {
+      "path": "links",
+      "children": [
+        {
+          "path": "{linkId}",
+          "name": "Link",
+          "children": [
+            {
+              "path": "edit",
+              "name": "Edit Link"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "login",
+      "children": [
+        {
+          "path": "two-factor",
+          "name": "Two-factor authentication"
+        }
+      ]
+    },
+    {
+      "path": "pixels",
+      "children": [
+        {
+          "path": "{pixelId}",
+          "name": "Pixel",
+          "children": [
+            {
+              "path": "edit",
+              "name": "Edit Pixel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "settings/api-keys"
+    },
+    {
+      "path": "settings/preferences"
+    },
+    {
+      "path": "settings/profile"
+    },
+    {
+      "path": "settings/security"
+    },
+    {
+      "path": "settings/teams",
+      "children": [
+        {
+          "path": "{teamId}",
+          "name": "Team"
+        }
+      ]
+    },
+    {
+      "path": "settings/websites",
+      "children": [
+        {
+          "path": "{websiteId}",
+          "name": "Website"
+        }
+      ]
+    },
+    {
+      "path": "teams"
+    },
+    {
+      "path": "websites",
+      "children": [
+        {
+          "path": "{websiteId}",
+          "name": "Overview",
+          "views": {
+            "view": [
+              "path",
+              "fullPath",
+              "entry",
+              "exit",
+              "title",
+              "query",
+              "referrer",
+              "channel",
+              "domain",
+              "country",
+              "region",
+              "city",
+              "browser",
+              "os",
+              "device",
+              "language",
+              "screen",
+              "utmSource",
+              "utmMedium",
+              "utmCampaign",
+              "utmContent",
+              "utmTerm",
+              "event",
+              "hostname",
+              "distinctId",
+              "tag"
+            ]
+          },
+          "children": [
+            {
+              "path": "attribution"
+            },
+            {
+              "path": "breakdown"
+            },
+            {
+              "path": "cohorts"
+            },
+            {
+              "path": "compare",
+              "views": {
+                "view": [
+                  "path",
+                  "channel",
+                  "referrer",
+                  "browser",
+                  "os",
+                  "device",
+                  "country",
+                  "region",
+                  "city",
+                  "language",
+                  "screen",
+                  "event",
+                  "utmSource",
+                  "utmMedium",
+                  "utmCampaign",
+                  "utmContent",
+                  "utmTerm",
+                  "hostname",
+                  "distinctId",
+                  "tag"
+                ]
+              }
+            },
+            {
+              "path": "events"
+            },
+            {
+              "path": "funnels"
+            },
+            {
+              "path": "goals"
+            },
+            {
+              "path": "heatmaps"
+            },
+            {
+              "path": "journeys"
+            },
+            {
+              "path": "performance"
+            },
+            {
+              "path": "realtime"
+            },
+            {
+              "path": "replays",
+              "children": [
+                {
+                  "path": "{replayId}",
+                  "name": "Session Replay"
+                }
+              ]
+            },
+            {
+              "path": "retention"
+            },
+            {
+              "path": "revenue"
+            },
+            {
+              "path": "segments"
+            },
+            {
+              "path": "sessions",
+              "children": [
+                {
+                  "path": "{sessionId}",
+                  "name": "Session"
+                }
+              ]
+            },
+            {
+              "path": "settings"
+            },
+            {
+              "path": "utm",
+              "name": "UTM Parameters"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -89,15 +89,21 @@ export function SimpleShareEditForm({
         allowFilter: share?.parameters?.allowFilter ?? true,
         theme: share?.parameters?.theme || 'system',
       }}
+      aria-label={t(labels.share)}
     >
       {({ watch, setValue }) => (
         <Column gap="6">
           <Column gap="1">
             <Label>{t(labels.shareUrl)}</Label>
-            <TextField value={getUrl(share?.slug || '')} isReadOnly allowCopy />
+            <TextField
+              value={getUrl(share?.slug || '')}
+              isReadOnly
+              allowCopy
+              aria-label={t(labels.shareUrl)}
+            />
           </Column>
           <FormField label={t(labels.name)} name="name" rules={{ required: t(labels.required) }}>
-            <TextField autoComplete="off" autoFocus />
+            <TextField autoComplete="off" autoFocus aria-required />
           </FormField>
           <Row gap="6">
             <FormField label={t(labels.filters)} name="allowFilter">

@@ -11,6 +11,7 @@ export function LinkEditButton({ linkId }: { linkId: string }) {
     <LinkButton
       href={renderUrl(`/links/${linkId}/edit`, false)}
       aria-label={t(labels.edit)}
+      data-agentom-id={`link.${linkId}.edit`}
       variant="quiet"
     >
       <Icon>

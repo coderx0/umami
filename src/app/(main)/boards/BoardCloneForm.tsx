@@ -79,7 +79,12 @@ export function BoardCloneForm({
   }
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} values={values}>
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      values={values}
+      aria-label="Clone board"
+    >
       {({ watch, setValue }) => {
         const entityId = watch('entityId') as string;
         const entityLabel =
@@ -104,7 +109,12 @@ export function BoardCloneForm({
         return (
           <>
             <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-              <TextField autoComplete="off" autoFocus placeholder={t(labels.untitled)} />
+              <TextField
+                autoComplete="off"
+                autoFocus
+                placeholder={t(labels.untitled)}
+                aria-required
+              />
             </FormField>
             <FormField name="description" label={t(labels.description)}>
               <TextField

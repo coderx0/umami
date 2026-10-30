@@ -54,11 +54,12 @@ export function SimpleShareCreateForm({
       onSubmit={handleSubmit}
       error={getErrorMessage(error)}
       defaultValues={{ name: '', allowFilter: true, theme: 'system' }}
+      aria-label={t(labels.addShareLink)}
     >
       {({ watch, setValue }) => (
         <Column gap="4">
           <FormField label={t(labels.name)} name="name" rules={{ required: t(labels.required) }}>
-            <TextField autoComplete="off" autoFocus />
+            <TextField autoComplete="off" autoFocus aria-required />
           </FormField>
           <Row gap="6">
             <FormField label={t(labels.filters)} name="allowFilter">

@@ -11,6 +11,7 @@ import {
   Text,
   TextField,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { useBoardQuery, useMessages, useNavigation, useUpdateQuery } from '@/components/hooks';
 import { LinkSelect } from '@/components/input/LinkSelect';
 import { PixelSelect } from '@/components/input/PixelSelect';
@@ -56,6 +57,7 @@ export function BoardEditForm({
   onClose?: () => void;
 }) {
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const typeChoicesId = useId();
   const { teamId: navigationTeamId } = useNavigation();
   const resolvedTeamId = teamId ?? navigationTeamId;
   const { data: board, isLoading } = useBoardQuery(boardId || '');
@@ -88,7 +90,12 @@ export function BoardEditForm({
   }
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} values={values}>
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      values={values}
+      aria-label={t(labels.board)}
+    >
       {({ watch, setValue }) => {
         const type = watch('type') as BoardType;
         const entityId = watch('entityId') as string;
@@ -119,7 +126,12 @@ export function BoardEditForm({
         return (
           <>
             <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-              <TextField autoComplete="off" autoFocus={!boardId} placeholder={t(labels.untitled)} />
+              <TextField
+                autoComplete="off"
+                autoFocus={!boardId}
+                placeholder={t(labels.untitled)}
+                aria-required
+              />
             </FormField>
             <FormField name="description" label={t(labels.description)}>
               <TextField
@@ -138,12 +150,25 @@ export function BoardEditForm({
                 {boardId ? (
                   <Text>{boardTypeLabel}</Text>
                 ) : (
-                  <Select value={type} onChange={handleTypeChange}>
-                    <ListItem id={BOARD_TYPES.mixed}>{t(labels.open)}</ListItem>
-                    <ListItem id={BOARD_TYPES.website}>{t(labels.website)}</ListItem>
-                    <ListItem id={BOARD_TYPES.pixel}>{t(labels.pixel)}</ListItem>
-                    <ListItem id={BOARD_TYPES.link}>{t(labels.link)}</ListItem>
-                  </Select>
+                  <>
+                    {/* what the select offers, named before it opens (guidelines 1.16) */}
+                    <span id={typeChoicesId} hidden>
+                      {`${t(labels.choices)}: ${t(labels.open)}, ${t(labels.website)}, ${t(labels.pixel)}, ${t(labels.link)}. ${t(messages.boardTypeHint)}`}
+                    </span>
+                    <Select
+                      value={type}
+                      onChange={handleTypeChange}
+                      buttonProps={{
+                        'aria-label': t(labels.boardType),
+                        'aria-describedby': typeChoicesId,
+                      }}
+                    >
+                      <ListItem id={BOARD_TYPES.mixed}>{t(labels.open)}</ListItem>
+                      <ListItem id={BOARD_TYPES.website}>{t(labels.website)}</ListItem>
+                      <ListItem id={BOARD_TYPES.pixel}>{t(labels.pixel)}</ListItem>
+                      <ListItem id={BOARD_TYPES.link}>{t(labels.link)}</ListItem>
+                    </Select>
+                  </>
                 )}
               </Box>
             </FormField>

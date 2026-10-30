@@ -1,5 +1,5 @@
 import { Button, Column, Heading, Row, Text } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { IconLabel } from '@/components/common/IconLabel';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useLinkSharesQuery, useMessages } from '@/components/hooks';
@@ -30,14 +30,24 @@ function LinkShareFormContent({
 }) {
   const { t, labels, messages } = useMessages();
   const [isCreating, setIsCreating] = useState(false);
+  const shareHintId = useId();
   const showCreateForm = isCreating;
 
   return (
     <Column gap="4">
       <Row justifyContent="space-between" alignItems="center">
         <Heading>{t(labels.share)}</Heading>
+        <span id={shareHintId} hidden>
+          {t(messages.shareAddHint)}
+        </span>
         {!isCreating && (
-          <Button variant="primary" onPress={() => setIsCreating(true)}>
+          <Button
+            variant="primary"
+            onPress={() => setIsCreating(true)}
+            aria-label={t(labels.addShareLink)}
+            aria-describedby={shareHintId}
+            data-agentom-id="share.add"
+          >
             <IconLabel icon={<Plus size={16} />} label={t(labels.add)} />
           </Button>
         )}

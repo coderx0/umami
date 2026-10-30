@@ -54,11 +54,12 @@ export function BoardShareCreateForm({
       onSubmit={handleSubmit}
       error={getErrorMessage(error)}
       defaultValues={{ name: '', allowFilter: true, theme: 'system' }}
+      aria-label={t(labels.addShareLink)}
     >
       {({ watch, setValue }) => (
         <Column gap="4">
           <FormField label={t(labels.name)} name="name" rules={{ required: t(labels.required) }}>
-            <TextField autoComplete="off" autoFocus />
+            <TextField autoComplete="off" autoFocus aria-required />
           </FormField>
           <FormField name="allowFilter">
             <Checkbox>{t(labels.filters)}</Checkbox>

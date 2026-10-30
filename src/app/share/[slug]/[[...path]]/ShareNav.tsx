@@ -8,6 +8,7 @@ import {
   Tooltip,
   TooltipTrigger,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { IconLabel } from '@/components/common/IconLabel';
 import Link from '@/components/common/Link';
 import { useMessages, useNavigation, useShare } from '@/components/hooks';
@@ -15,6 +16,7 @@ import { AlignEndHorizontal, Clock, Eye, PanelLeft, Sheet, Tag, User } from '@/c
 import { LanguageButton } from '@/components/input/LanguageButton';
 import { PreferencesButton } from '@/components/input/PreferencesButton';
 import { Funnel, Gauge, Lightning, Magnet, Money, Network, Path, Target } from '@/components/svg';
+import { ariaCurrent } from '@/lib/aria';
 import { allowShareFilter, excludeShareFilterParam, getShareTheme } from '@/lib/share';
 import { buildPath } from '@/lib/url';
 import { ShareBranding } from './ShareBranding';
@@ -29,7 +31,8 @@ export function ShareNav({
   onItemClick?: () => void;
 }) {
   const share = useShare();
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const themeHintId = useId();
   const { pathname, query } = useNavigation();
   const { slug, parameters } = share;
   const allowFilter = allowShareFilter(parameters);
@@ -157,14 +160,28 @@ export function ShareNav({
       >
         {!collapsed && <ShareBranding size="md" />}
         {!onItemClick && (
-          <Button variant="quiet" onPress={() => onCollapse?.(!collapsed)}>
+          <Button
+            variant="quiet"
+            onPress={() => onCollapse?.(!collapsed)}
+            aria-label={t(collapsed ? labels.expandSidebar : labels.collapseSidebar)}
+            data-agentom-id="nav.sidebar-toggle"
+          >
             <Icon color="muted">
               <PanelLeft />
             </Icon>
           </Button>
         )}
       </Row>
-      <Column flexGrow={1} marginTop="2" overflowY="auto" gap="2">
+      {/* links, named by their section, the current one marked (guidelines 1.4, 1.11) */}
+      <Column
+        flexGrow={1}
+        marginTop="2"
+        overflowY="auto"
+        gap="2"
+        as="nav"
+        aria-label={t(labels.navigation)}
+        data-agentom-id="nav"
+      >
         {items.map(({ label: sectionLabel, items: sectionItems }, index) => (
           <Column key={`${sectionLabel}${index}`} gap="1" marginBottom="1">
             {!collapsed && (
@@ -175,7 +192,13 @@ export function ShareNav({
             {sectionItems.map(({ id, path, label, icon }) => {
               const isSelected = selectedKey === id;
               return (
-                <Link key={id} href={path} role="button" onClick={onItemClick}>
+                <Link
+                  key={id}
+                  href={path}
+                  onClick={onItemClick}
+                  aria-label={label}
+                  aria-current={ariaCurrent(pathname, path, isSelected)}
+                >
                   {collapsed ? (
                     <TooltipTrigger delay={0}>
                       <Row
@@ -213,6 +236,9 @@ export function ShareNav({
           </Column>
         ))}
       </Column>
+      <span id={themeHintId} hidden>
+        {t(messages.themeToggleHint)}
+      </span>
       <Column
         flexGrow={collapsed ? 1 : undefined}
         justifyContent="flex-end"
@@ -220,13 +246,17 @@ export function ShareNav({
       >
         {collapsed ? (
           <Column gap="2" alignItems="center">
-            {!shareTheme && <ThemeButton />}
+            {!shareTheme && (
+              <ThemeButton aria-label={t(labels.theme)} aria-describedby={themeHintId} />
+            )}
             <LanguageButton />
             <PreferencesButton />
           </Column>
         ) : (
           <Row>
-            {!shareTheme && <ThemeButton />}
+            {!shareTheme && (
+              <ThemeButton aria-label={t(labels.theme)} aria-describedby={themeHintId} />
+            )}
             <LanguageButton />
             <PreferencesButton />
           </Row>

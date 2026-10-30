@@ -21,7 +21,9 @@ export function WebsiteDateFilter({
   allowCompare,
 }: WebsiteDateFilterProps) {
   const { dateRange, isAllTime, isCustomRange } = useDateRange();
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const previousHintId = useId();
+  const nextHintId = useId();
   const compareChoicesId = useId();
   const {
     router,
@@ -66,10 +68,18 @@ export function WebsiteDateFilter({
     <Row wrap="wrap" gap>
       {showButtons && !isAllTime && !isCustomRange && (
         <Row gap="1">
+          {/* what they do: "Previous period" moves the dates, it doesn't compare (guidelines 3.3) */}
+          <span id={previousHintId} hidden>
+            {t(messages.previousPeriodHint)}
+          </span>
+          <span id={nextHintId} hidden>
+            {t(messages.nextPeriodHint)}
+          </span>
           <Button
             onPress={() => handleIncrement(-1)}
             variant="outline"
             aria-label={t(labels.previousPeriod)}
+            aria-describedby={previousHintId}
             data-agentom-id="filter.previous-period"
           >
             <Icon rotate={180}>
@@ -81,6 +91,7 @@ export function WebsiteDateFilter({
             variant="outline"
             isDisabled={disableForward}
             aria-label={t(labels.nextPeriod)}
+            aria-describedby={nextHintId}
             data-agentom-id="filter.next-period"
           >
             <Icon>

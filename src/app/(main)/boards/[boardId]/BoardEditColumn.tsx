@@ -39,6 +39,7 @@ export function BoardEditColumn({
 }) {
   const [showSelect, setShowSelect] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
   const { board } = useBoard();
   const { t, labels } = useMessages();
   const { teamId } = useNavigation();
@@ -81,22 +82,33 @@ export function BoardEditColumn({
   };
 
   return (
+    // The actions stay rendered, shown on hover and on keyboard focus: what's
+    // only rendered on mouseenter, neither a keyboard nor an agent can reach.
     <Panel
       title={title}
       description={description}
       width="100%"
       height="100%"
       position="relative"
+      role="group"
+      aria-label={title || definition?.name || 'Empty column'}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
+      onFocus={() => setHasFocus(true)}
+      onBlur={e => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setHasFocus(false);
+      }}
     >
-      {canEdit && (showActions || !hasComponent) && (
+      {canEdit && (
         <Box
           position="absolute"
           top="50%"
           left="50%"
           zIndex={100}
-          style={{ transform: 'translate(-50%, -50%)' }}
+          style={{
+            transform: 'translate(-50%, -50%)',
+            opacity: showActions || hasFocus || !hasComponent ? 1 : 0,
+          }}
         >
           <Row
             gap="1"
@@ -105,14 +117,18 @@ export function BoardEditColumn({
             backgroundColor={hasComponent ? 'surface-sunken' : undefined}
           >
             <TooltipTrigger delay={0}>
-              <Button variant="outline" onPress={() => setShowSelect(true)}>
+              <Button
+                variant="outline"
+                onPress={() => setShowSelect(true)}
+                aria-label={t(hasComponent ? labels.edit : labels.selectComponent)}
+              >
                 <Icon size="sm">{hasComponent ? <Pencil /> : <Plus />}</Icon>
               </Button>
               <Tooltip>{t(hasComponent ? labels.edit : labels.selectComponent)}</Tooltip>
             </TooltipTrigger>
             {canRemoveAction && (
               <TooltipTrigger delay={0}>
-                <Button variant="outline" onPress={handleRemove}>
+                <Button variant="outline" onPress={handleRemove} aria-label={t(labels.remove)}>
                   <Icon size="sm">
                     <X />
                   </Icon>

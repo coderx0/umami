@@ -11,7 +11,7 @@ import {
   Row,
   TextField,
 } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useConfig, useLinkQuery, useMessages } from '@/components/hooks';
 import { useUpdateQuery } from '@/components/hooks/queries/useUpdateQuery';
 import { RefreshCw } from '@/components/icons';
@@ -33,6 +33,7 @@ export function LinkEditForm({
   onClose?: () => void;
 }) {
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const regenerateHintId = useId();
   const { mutateAsync, error, isPending, touch, toast } = useUpdateQuery(
     linkId ? `/links/${linkId}` : '/links',
     {
@@ -75,6 +76,7 @@ export function LinkEditForm({
       onSubmit={handleSubmit}
       error={getErrorMessage(error)}
       defaultValues={{ slug: defaultSlug, ...data }}
+      aria-label={t(labels.link)}
     >
       {({ setValue, watch }) => {
         const slug = watch('slug');
@@ -82,7 +84,7 @@ export function LinkEditForm({
         return (
           <>
             <FormField label={t(labels.name)} name="name" rules={{ required: t(labels.required) }}>
-              <TextField autoComplete="off" autoFocus />
+              <TextField autoComplete="off" autoFocus aria-required />
             </FormField>
 
             <FormField
@@ -90,7 +92,7 @@ export function LinkEditForm({
               name="url"
               rules={{ required: t(labels.required), validate: checkUrl }}
             >
-              <TextField placeholder="https://example.com" autoComplete="off" />
+              <TextField placeholder="https://example.com" autoComplete="off" aria-required />
             </FormField>
 
             {cloudMode ? (
@@ -112,11 +114,17 @@ export function LinkEditForm({
                     required: t(labels.required),
                   }}
                 >
-                  <TextField autoComplete="off" />
+                  <TextField autoComplete="off" aria-required />
                 </FormField>
+                <span id={regenerateHintId} hidden>
+                  {t(messages.regenerateSlugHint)}
+                </span>
                 <Button
                   variant="quiet"
                   onPress={() => setValue('slug', generateId(), { shouldDirty: true })}
+                  aria-label={t(labels.regenerateSlug)}
+                  aria-describedby={regenerateHintId}
+                  data-agentom-id="link.regenerate-slug"
                 >
                   <Icon>
                     <RefreshCw />
@@ -133,6 +141,7 @@ export function LinkEditForm({
                   autoComplete="off"
                   isReadOnly
                   allowCopy
+                  aria-label={t(labels.link)}
                   style={{ width: '100%' }}
                 />
               </Row>

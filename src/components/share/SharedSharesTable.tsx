@@ -34,10 +34,18 @@ export function SharedSharesTable({
     return `${origin}${process.env.basePath || ''}/share/${slug}`;
   };
 
+  // A table to whatever reads it (guidelines 1.2, 1.7): rows named by the share's
+  // name, so each row's buttons say which share they act on. On a phone it's
+  // a plain list of cards.
   return (
-    <div style={{ width: '100%' }}>
+    <div
+      style={{ width: '100%' }}
+      role={isMobile ? undefined : 'table'}
+      aria-label={isMobile ? undefined : t(labels.shareUrl)}
+    >
       {!isMobile && (
         <div
+          role="row"
           style={{
             display: 'grid',
             gridTemplateColumns: desktopGridTemplateColumns,
@@ -47,9 +55,15 @@ export function SharedSharesTable({
             borderBottom: rowBorder,
           }}
         >
-          <Text weight="bold">{t(labels.name)}</Text>
-          <Text weight="bold">{t(labels.shareUrl)}</Text>
-          <div />
+          <Text weight="bold" role="columnheader">
+            {t(labels.name)}
+          </Text>
+          <Text weight="bold" role="columnheader">
+            {t(labels.shareUrl)}
+          </Text>
+          <div role="columnheader">
+            <span className="sr-only">{t(labels.actions)}</span>
+          </div>
         </div>
       )}
       <div>
@@ -79,6 +93,7 @@ export function SharedSharesTable({
           return (
             <div
               key={row.id}
+              role="row"
               style={{
                 display: 'grid',
                 gridTemplateColumns: desktopGridTemplateColumns,
@@ -89,9 +104,13 @@ export function SharedSharesTable({
                 borderBottom: rowBorder,
               }}
             >
-              <Text>{row.name}</Text>
-              <ShareUrlCell url={url} value={url} />
-              <Row justifyContent="flex-end">{renderActions(row)}</Row>
+              <Text role="rowheader">{row.name}</Text>
+              <div role="cell" style={{ minWidth: 0 }}>
+                <ShareUrlCell url={url} value={url} />
+              </div>
+              <Row justifyContent="flex-end" role="cell">
+                {renderActions(row)}
+              </Row>
             </div>
           );
         })}

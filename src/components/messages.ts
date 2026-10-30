@@ -476,6 +476,7 @@ export const labels: Record<string, string> = {
   chartMetric: 'label.chart-metric',
   resetSetting: 'label.reset-setting',
   regenerateAccessCode: 'label.regenerate-access-code',
+  regenerateSlug: 'label.regenerate-slug',
 };
 
 export const messages: Record<string, string> = {
@@ -611,4 +612,19 @@ export const messages: Record<string, string> = {
   teamsSearchRule: 'message.teams-search-rule',
   memberAddHint: 'message.member-add-hint',
   memberEditHint: 'message.member-edit-hint',
+  linkAddHint: 'message.link-add-hint',
+  pixelAddHint: 'message.pixel-add-hint',
+  linksSearchRule: 'message.links-search-rule',
+  pixelsSearchRule: 'message.pixels-search-rule',
+  regenerateSlugHint: 'message.regenerate-slug-hint',
+  shareAddHint: 'message.share-add-hint',
+  shareEditHint: 'message.share-edit-hint',
+  boardAddHint: 'message.board-add-hint',
+  boardTypeHint: 'message.board-type-hint',
+  boardsSearchRule: 'message.boards-search-rule',
+  boardCloneHint: 'message.board-clone-hint',
+  themeToggleHint: 'message.theme-toggle-hint',
+  preferencesHint: 'message.preferences-hint',
+  previousPeriodHint: 'message.previous-period-hint',
+  nextPeriodHint: 'message.next-period-hint',
 };

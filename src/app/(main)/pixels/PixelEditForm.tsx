@@ -10,7 +10,7 @@ import {
   Row,
   TextField,
 } from '@umami/react-zen';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useConfig, useMessages, usePixelQuery } from '@/components/hooks';
 import { useUpdateQuery } from '@/components/hooks/queries/useUpdateQuery';
 import { RefreshCw } from '@/components/icons';
@@ -31,6 +31,7 @@ export function PixelEditForm({
   onClose?: () => void;
 }) {
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const regenerateHintId = useId();
   const { mutateAsync, error, isPending, touch, toast } = useUpdateQuery(
     pixelId ? `/pixels/${pixelId}` : '/pixels',
     {
@@ -75,12 +76,17 @@ export function PixelEditForm({
   }
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} defaultValues={{ slug, ...data }}>
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      defaultValues={{ slug, ...data }}
+      aria-label={t(labels.pixel)}
+    >
       {({ setValue }) => {
         return (
           <>
             <FormField label={t(labels.name)} name="name" rules={{ required: t(labels.required) }}>
-              <TextField autoComplete="off" />
+              <TextField autoComplete="off" aria-required />
             </FormField>
 
             <FormField
@@ -101,9 +107,18 @@ export function PixelEditForm({
                   autoComplete="off"
                   isReadOnly
                   allowCopy
+                  aria-label={t(labels.link)}
                   style={{ width: '100%' }}
                 />
-                <Button onPress={() => setValue('slug', handleSlug(), { shouldDirty: true })}>
+                <span id={regenerateHintId} hidden>
+                  {t(messages.regenerateSlugHint)}
+                </span>
+                <Button
+                  onPress={() => setValue('slug', handleSlug(), { shouldDirty: true })}
+                  aria-label={t(labels.regenerateSlug)}
+                  aria-describedby={regenerateHintId}
+                  data-agentom-id="pixel.regenerate-slug"
+                >
                   <Icon>
                     <RefreshCw />
                   </Icon>

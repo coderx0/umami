@@ -1,5 +1,5 @@
 import { Button, Column, ListItem, Row, Select, Text, TextField } from '@umami/react-zen';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { useApi, useMessages } from '@/components/hooks';
 import { useModified } from '@/components/hooks/useModified';
 import { LinkSelect } from '@/components/input/LinkSelect';
@@ -49,6 +49,7 @@ export function BoardComponentSelect({
   onClose: () => void;
 }) {
   const { t, labels, messages } = useMessages();
+  const idBase = useId();
   const { get, useQuery } = useApi();
   const initialEntity = getComponentEntity(initialConfig);
   const [selectedDef, setSelectedDef] = useState<ComponentDefinition | null>(null);
@@ -305,9 +306,17 @@ export function BoardComponentSelect({
                 <Text size="sm" color="muted">
                   {t(labels.type)}
                 </Text>
+                {/* what the select offers, named before it opens (guidelines 1.16) */}
+                <span id={`${idBase}-type`} hidden>
+                  {`${t(labels.choices)}: ${t(labels.website)}, ${t(labels.pixel)}, ${t(labels.link)}`}
+                </span>
                 <Select
                   value={selectedEntityType}
                   onChange={value => handleEntityTypeChange(value as string)}
+                  buttonProps={{
+                    'aria-label': t(labels.type),
+                    'aria-describedby': `${idBase}-type`,
+                  }}
                 >
                   <ListItem id={BOARD_ENTITY_TYPES.website}>{t(labels.website)}</ListItem>
                   <ListItem id={BOARD_ENTITY_TYPES.pixel}>{t(labels.pixel)}</ListItem>
@@ -352,14 +361,24 @@ export function BoardComponentSelect({
             <Text size="sm" color="muted">
               {t(labels.title)}
             </Text>
-            <TextField value={title} onChange={setTitle} autoComplete="off" />
+            <TextField
+              value={title}
+              onChange={setTitle}
+              autoComplete="off"
+              aria-label={t(labels.title)}
+            />
           </Column>
 
           <Column gap="2">
             <Text size="sm" color="muted">
               {t(labels.description)}
             </Text>
-            <TextField value={description} onChange={setDescription} autoComplete="off" />
+            <TextField
+              value={description}
+              onChange={setDescription}
+              autoComplete="off"
+              aria-label={t(labels.description)}
+            />
           </Column>
 
           {selectedDef?.configFields && selectedDef.configFields.length > 0 && (
@@ -371,26 +390,40 @@ export function BoardComponentSelect({
                   </Text>
 
                   {field.type === 'select' && (
-                    <Select
-                      value={String(configValues[field.name] ?? field.defaultValue ?? '')}
-                      onChange={value => handleConfigChange(field.name, value as string)}
-                      maxHeight={300}
-                      popoverProps={{ style: { width: 220 } }}
-                    >
-                      {(field.optionsByEntityType?.[activeEntityType] ?? field.options)?.map(
-                        option => (
-                          <ListItem key={option.value} id={option.value}>
-                            {option.label}
-                          </ListItem>
-                        ),
-                      )}
-                    </Select>
+                    <>
+                      <span id={`${idBase}-${field.name}`} hidden>
+                        {`${t(labels.choices)}: ${(
+                          field.optionsByEntityType?.[activeEntityType] ?? field.options
+                        )
+                          ?.map(option => option.label)
+                          .join(', ')}`}
+                      </span>
+                      <Select
+                        value={String(configValues[field.name] ?? field.defaultValue ?? '')}
+                        onChange={value => handleConfigChange(field.name, value as string)}
+                        maxHeight={300}
+                        popoverProps={{ style: { width: 220 } }}
+                        buttonProps={{
+                          'aria-label': field.label,
+                          'aria-describedby': `${idBase}-${field.name}`,
+                        }}
+                      >
+                        {(field.optionsByEntityType?.[activeEntityType] ?? field.options)?.map(
+                          option => (
+                            <ListItem key={option.value} id={option.value}>
+                              {option.label}
+                            </ListItem>
+                          ),
+                        )}
+                      </Select>
+                    </>
                   )}
 
                   {field.type === 'text' && (
                     <TextField
                       value={String(configValues[field.name] ?? field.defaultValue ?? '')}
                       onChange={(value: string) => handleConfigChange(field.name, value)}
+                      aria-label={field.label}
                     />
                   )}
 
@@ -399,6 +432,7 @@ export function BoardComponentSelect({
                       type="number"
                       value={String(configValues[field.name] ?? field.defaultValue ?? '')}
                       onChange={(value: string) => handleConfigChange(field.name, value)}
+                      aria-label={field.label}
                     />
                   )}
 
@@ -408,16 +442,28 @@ export function BoardComponentSelect({
                       value={String(configValues[field.name] ?? field.defaultValue ?? '')}
                       onChange={(value: string) => handleConfigChange(field.name, value)}
                       style={{ minHeight: 200 }}
+                      aria-label={field.label}
                     />
                   )}
 
                   {field.type === 'report' && (
                     <>
+                      <span id={`${idBase}-${field.name}`} hidden>
+                        {`${t(labels.choices)}: ${(
+                          reportOptionsByType[field.reportType ?? ''] ?? []
+                        )
+                          .map(option => option.name)
+                          .join(', ')}`}
+                      </span>
                       <Select
                         value={String(configValues[field.name] ?? field.defaultValue ?? '')}
                         onChange={value => handleConfigChange(field.name, value as string)}
                         maxHeight={300}
                         popoverProps={{ style: { width: 220 } }}
+                        buttonProps={{
+                          'aria-label': field.label,
+                          'aria-describedby': `${idBase}-${field.name}`,
+                        }}
                       >
                         {(reportOptionsByType[field.reportType ?? ''] ?? []).map(option => (
                           <ListItem key={option.id} id={option.id}>
@@ -449,10 +495,18 @@ export function BoardComponentSelect({
           <Text weight="bold">Components</Text>
           <Column border="left" paddingLeft="4" height="100%" style={{ minHeight: 0 }}>
             {hasSelectedEntity ? (
-              <Column gap="1" height="100%" style={{ overflowY: 'auto', minHeight: 0 }}>
+              // one choice of component: a listbox, its options by group, the chosen one
+              // selected (guidelines 1.2, 1.4)
+              <Column
+                gap="1"
+                height="100%"
+                style={{ overflowY: 'auto', minHeight: 0 }}
+                role="listbox"
+                aria-label="Components"
+              >
                 {groupedDefinitions.map(({ group, definitions }) => (
-                  <Column key={group} gap="1" paddingBottom="2">
-                    <Text size="sm" color="muted" weight="bold">
+                  <Column key={group} gap="1" paddingBottom="2" role="group" aria-label={group}>
+                    <Text size="sm" color="muted" weight="bold" aria-hidden>
                       {group}
                     </Text>
                     {definitions.map(def => {
@@ -461,6 +515,16 @@ export function BoardComponentSelect({
                       return (
                         <Row
                           key={def.type}
+                          role="option"
+                          aria-selected={selectedDef?.type === def.type}
+                          aria-label={def.name}
+                          aria-describedby={`${idBase}-${def.type}`}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleSelectComponent(def);
+                            }
+                          }}
                           tabIndex={0}
                           gap="3"
                           alignItems="flex-start"
@@ -482,7 +546,7 @@ export function BoardComponentSelect({
                             >
                               {def.name}
                             </Text>
-                            <Text size="xs" color="muted">
+                            <Text size="xs" color="muted" id={`${idBase}-${def.type}`}>
                               {def.description}
                             </Text>
                           </Column>
