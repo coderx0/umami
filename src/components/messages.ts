@@ -474,6 +474,8 @@ export const labels: Record<string, string> = {
   aboutMetric: 'label.about-metric',
   revenueChartMode: 'label.revenue-chart-mode',
   chartMetric: 'label.chart-metric',
+  resetSetting: 'label.reset-setting',
+  regenerateAccessCode: 'label.regenerate-access-code',
 };
 
 export const messages: Record<string, string> = {
@@ -594,4 +596,19 @@ export const messages: Record<string, string> = {
   currencySearchRule: 'message.currency-search-rule',
   customersSearchRule: 'message.customers-search-rule',
   heatmapPagesSearchRule: 'message.heatmap-pages-search-rule',
+  passwordChangeHint: 'message.password-change-hint',
+  timezoneSearchRule: 'message.timezone-search-rule',
+  languageSearchRule: 'message.language-search-rule',
+  apiKeyAddHint: 'message.api-key-add-hint',
+  teamAddHint: 'message.team-add-hint',
+  teamAddAdminHint: 'message.team-add-admin-hint',
+  teamJoinHint: 'message.team-join-hint',
+  membersSearchRule: 'message.members-search-rule',
+  regenerateAccessCodeHint: 'message.regenerate-access-code-hint',
+  userAddHint: 'message.user-add-hint',
+  usersSearchRule: 'message.users-search-rule',
+  passwordKeepHint: 'message.password-keep-hint',
+  teamsSearchRule: 'message.teams-search-rule',
+  memberAddHint: 'message.member-add-hint',
+  memberEditHint: 'message.member-edit-hint',
 };

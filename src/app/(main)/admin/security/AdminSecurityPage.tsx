@@ -1,12 +1,14 @@
 'use client';
+import { useQueryClient } from '@tanstack/react-query';
 import { Column, Row, Switch, Text } from '@umami/react-zen';
+import { useId } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Panel } from '@/components/common/Panel';
-import { useMessages, useUpdateQuery, useTwoFactorStatusQuery } from '@/components/hooks';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMessages, useTwoFactorStatusQuery, useUpdateQuery } from '@/components/hooks';
 
 export function AdminSecurityPage() {
   const { t, labels, messages } = useMessages();
+  const descriptionId = useId();
   const { data: status, isLoading } = useTwoFactorStatusQuery(true);
   const { mutateAsync: setGlobal } = useUpdateQuery('/admin/2fa/global');
   const queryClient = useQueryClient();
@@ -29,7 +31,7 @@ export function AdminSecurityPage() {
         <Column gap="4">
           <Column gap="1">
             <Text weight="bold">{t(labels.twoFactorAuth)}</Text>
-            <Text>
+            <Text id={descriptionId}>
               {showConfigurationError
                 ? t(messages.twoFactorErrorNotConfigured)
                 : t(messages.twoFactorAdminGlobalDescription)}
@@ -41,6 +43,10 @@ export function AdminSecurityPage() {
               isSelected={isGlobalRequired}
               isDisabled={!isConfigured && !isGlobalRequired}
               onChange={handleToggle}
+              aria-label={t(labels.twoFactorRequireGlobal)}
+              aria-describedby={descriptionId}
+              data-agentom-id="security.require-two-factor"
+              data-agentom-risk="sensitive"
             />
             <Text>{t(labels.twoFactorRequireGlobal)}</Text>
           </Row>

@@ -7,6 +7,7 @@ import {
   Row,
   TextField,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { IconLabel } from '@/components/common/IconLabel';
 import { useMessages, useTeam, useUpdateQuery } from '@/components/hooks';
 import { RefreshCw } from '@/components/icons';
@@ -27,6 +28,7 @@ export function TeamEditForm({
 }) {
   const team = useTeam();
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const regenerateHintId = useId();
 
   const { mutateAsync, error, isPending, touch, toast } = useUpdateQuery(`/teams/${teamId}`);
 
@@ -42,24 +44,46 @@ export function TeamEditForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} defaultValues={{ ...team }}>
+    // Fields with a copy button sit in a group named by the field, so each "Copy"
+    // says what it copies (guidelines 1.3). The access code lets anyone join the
+    // team: its value never goes into the projection (guidelines 4.5).
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      defaultValues={{ ...team }}
+      aria-label={t(labels.team)}
+    >
       {({ setValue }) => {
         return (
           <>
-            <FormField name="id" label={t(labels.teamId)}>
-              <TextField isReadOnly allowCopy />
-            </FormField>
+            <div role="group" aria-label={t(labels.teamId)}>
+              <FormField name="id" label={t(labels.teamId)}>
+                <TextField isReadOnly allowCopy />
+              </FormField>
+            </div>
             <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
               <TextField isReadOnly={!allowEdit} />
             </FormField>
             {showAccessCode && (
-              <Row alignItems="flex-end" gap>
+              <Row
+                alignItems="flex-end"
+                gap
+                role="group"
+                aria-label={t(labels.accessCode)}
+                data-agentom-redact=""
+              >
+                <span id={regenerateHintId} hidden>
+                  {t(messages.regenerateAccessCodeHint)}
+                </span>
                 <FormField name="accessCode" label={t(labels.accessCode)} style={{ flex: 1 }}>
                   <TextField isReadOnly allowCopy />
                 </FormField>
                 {allowEdit && (
                   <Button
                     onPress={() => setValue('accessCode', generateId(), { shouldDirty: true })}
+                    aria-label={t(labels.regenerateAccessCode)}
+                    aria-describedby={regenerateHintId}
+                    data-agentom-id="team.regenerate-access-code"
                   >
                     <IconLabel icon={<RefreshCw />} label={t(labels.regenerate)} />
                   </Button>

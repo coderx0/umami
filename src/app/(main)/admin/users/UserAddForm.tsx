@@ -9,12 +9,14 @@ import {
   Select,
   TextField,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { useMessages, useUpdateQuery } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 
 export function UserAddForm({ onSave, onClose }) {
   const { mutateAsync, error, isPending } = useUpdateQuery(`/users`);
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const roleChoicesId = useId();
 
   const handleSubmit = async (data: any) => {
     await mutateAsync(data, {
@@ -26,13 +28,17 @@ export function UserAddForm({ onSave, onClose }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} aria-label={t(labels.createUser)}>
+      {/* what the role select offers, named before it opens (guidelines 1.16) */}
+      <span id={roleChoicesId} hidden>
+        {`${t(labels.choices)}: ${t(labels.viewOnly)}, ${t(labels.user)}, ${t(labels.admin)}`}
+      </span>
       <FormField
         label={t(labels.username)}
         name="username"
         rules={{ required: t(labels.required) }}
       >
-        <TextField autoComplete="new-username" data-test="input-username" />
+        <TextField autoComplete="new-username" data-test="input-username" aria-required />
       </FormField>
       <FormField
         label={t(labels.password)}
@@ -42,10 +48,10 @@ export function UserAddForm({ onSave, onClose }) {
           minLength: { value: 8, message: t(messages.minPasswordLength, { n: '8' }) },
         }}
       >
-        <PasswordField autoComplete="new-password" data-test="input-password" />
+        <PasswordField autoComplete="new-password" data-test="input-password" aria-required />
       </FormField>
       <FormField label={t(labels.role)} name="role" rules={{ required: t(labels.required) }}>
-        <Select>
+        <Select buttonProps={{ 'aria-describedby': roleChoicesId }}>
           <ListItem id={ROLES.viewOnly} data-test="dropdown-item-viewOnly">
             {t(labels.viewOnly)}
           </ListItem>

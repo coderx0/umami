@@ -64,7 +64,11 @@ export function AdminWebsitesTable({ data = [], ...props }: { data: any[] }) {
             const { id } = row;
 
             return (
-              <MenuButton>
+              <MenuButton
+                label={`${t(labels.actions)}: ${row.name}`}
+                description={`${t(labels.actions)}: ${t(labels.edit)}, ${t(labels.delete)}`}
+                id={`website.${id}.actions`}
+              >
                 <MenuItem
                   onAction={() => router.push(`/admin/websites/${id}`)}
                   data-test="link-button-edit"
@@ -95,7 +99,7 @@ export function AdminWebsitesTable({ data = [], ...props }: { data: any[] }) {
       </DataTable>
       <ControlledDialog>
         <Modal isOpen={!!deleteWebsite}>
-          <Dialog style={{ width: 400 }}>
+          <Dialog title={t(labels.deleteWebsite)} style={{ width: 400 }}>
             <WebsiteDeleteForm websiteId={deleteWebsite} onClose={() => setDeleteWebsite(null)} />
           </Dialog>
         </Modal>

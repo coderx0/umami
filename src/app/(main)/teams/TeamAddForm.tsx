@@ -31,7 +31,7 @@ export function TeamAddForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} aria-label={t(labels.createTeam)}>
       <FormField name="name" label={t(labels.name)}>
         <TextField autoComplete="off" />
       </FormField>

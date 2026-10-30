@@ -8,6 +8,7 @@ import {
   Select,
   TextField,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { useLoginQuery, useMessages, useUpdateQuery, useUser } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 
@@ -15,6 +16,8 @@ export function UserEditForm({ userId, onSave }: { userId: string; onSave?: () =
   const { t, labels, messages, getErrorMessage } = useMessages();
   const user = useUser();
   const { user: login } = useLoginQuery();
+  const roleChoicesId = useId();
+  const passwordHintId = useId();
 
   const { mutateAsync, error, toast, touch } = useUpdateQuery(`/users/${userId}`);
 
@@ -30,7 +33,18 @@ export function UserEditForm({ userId, onSave }: { userId: string; onSave?: () =
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} values={user}>
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      values={user}
+      aria-label={t(labels.user)}
+    >
+      <span id={roleChoicesId} hidden>
+        {`${t(labels.choices)}: ${t(labels.viewOnly)}, ${t(labels.user)}, ${t(labels.admin)}`}
+      </span>
+      <span id={passwordHintId} hidden>
+        {t(messages.passwordKeepHint)}
+      </span>
       <FormField name="username" label={t(labels.username)}>
         <TextField data-test="input-username" />
       </FormField>
@@ -41,12 +55,16 @@ export function UserEditForm({ userId, onSave }: { userId: string; onSave?: () =
           minLength: { value: 8, message: t(messages.minPasswordLength, { n: '8' }) },
         }}
       >
-        <PasswordField autoComplete="new-password" data-test="input-password" />
+        <PasswordField
+          autoComplete="new-password"
+          data-test="input-password"
+          aria-describedby={passwordHintId}
+        />
       </FormField>
 
       {user.id !== login.id && (
         <FormField name="role" label={t(labels.role)} rules={{ required: t(labels.required) }}>
-          <Select defaultValue={user.role}>
+          <Select defaultValue={user.role} buttonProps={{ 'aria-describedby': roleChoicesId }}>
             <ListItem id={ROLES.viewOnly} data-test="dropdown-item-viewOnly">
               {t(labels.viewOnly)}
             </ListItem>
@@ -60,7 +78,13 @@ export function UserEditForm({ userId, onSave }: { userId: string; onSave?: () =
         </FormField>
       )}
       <FormButtons>
-        <FormSubmitButton data-test="button-submit" variant="primary">
+        {/* it can change another user's password and role (guidelines 4.3) */}
+        <FormSubmitButton
+          data-test="button-submit"
+          variant="primary"
+          data-agentom-id="user.save"
+          data-agentom-risk="sensitive"
+        >
           {t(labels.save)}
         </FormSubmitButton>
       </FormButtons>

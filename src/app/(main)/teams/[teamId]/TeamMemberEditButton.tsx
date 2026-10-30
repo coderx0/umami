@@ -1,4 +1,5 @@
 import { useToast } from '@umami/react-zen';
+import { useId } from 'react';
 import { useMessages, useModified } from '@/components/hooks';
 import { Edit } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
@@ -18,6 +19,7 @@ export function TeamMemberEditButton({
   const { t, labels, messages } = useMessages();
   const { toast } = useToast();
   const { touch } = useModified();
+  const hintId = useId();
 
   const handleSave = () => {
     touch('teams:members');
@@ -26,16 +28,30 @@ export function TeamMemberEditButton({
   };
 
   return (
-    <DialogButton icon={<Edit />} title={t(labels.editMember)} variant="quiet" width="400px">
-      {({ close }) => (
-        <TeamMemberEditForm
-          teamId={teamId}
-          userId={userId}
-          role={role}
-          onSave={handleSave}
-          onClose={close}
-        />
-      )}
-    </DialogButton>
+    <>
+      {/* what the dialog asks for (guidelines 1.16) */}
+      <span id={hintId} hidden>
+        {t(messages.memberEditHint)}
+      </span>
+      <DialogButton
+        icon={<Edit />}
+        title={t(labels.editMember)}
+        variant="quiet"
+        width="400px"
+        aria-label={t(labels.editMember)}
+        aria-describedby={hintId}
+        data-agentom-id={`member.${userId}.edit`}
+      >
+        {({ close }) => (
+          <TeamMemberEditForm
+            teamId={teamId}
+            userId={userId}
+            role={role}
+            onSave={handleSave}
+            onClose={close}
+          />
+        )}
+      </DialogButton>
+    </>
   );
 }

@@ -55,7 +55,11 @@ export function UsersTable({
               const { id } = row;
 
               return (
-                <MenuButton>
+                <MenuButton
+                  label={`${t(labels.actions)}: ${row.username}`}
+                  description={`${t(labels.actions)}: ${t(labels.edit)}, ${t(labels.delete)}`}
+                  id={`user.${id}.actions`}
+                >
                   <MenuItem
                     onAction={() => router.push(`/admin/users/${id}`)}
                     data-test="link-button-edit"

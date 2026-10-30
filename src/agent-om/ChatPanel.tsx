@@ -1,5 +1,6 @@
 'use client';
-import { type CSSProperties, useState } from 'react';
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useClaude, whatClaudeSees } from './use-claude';
 
 // The dev-only chat: a request in, Claude Haiku carries it out on the page.
@@ -41,6 +42,48 @@ const primary: CSSProperties = {
 };
 const box: CSSProperties = { padding: 10, borderRadius: 8, background: 'rgba(127,127,127,.12)' };
 
+/**
+ * A question to the user (a risky step, a secret), as a native modal dialog:
+ * the browser's top layer is above the app's own modal, whose backdrop covers
+ * the chat column, so it can be answered while a page dialog is open (the
+ * step it asks about is usually in one). Escape answers no. It's put in
+ * <body>, outside the app's root, which a page dialog marks aria-hidden.
+ * Shown only during a run, so never rendered on the server.
+ */
+function Prompt({ children, onDismiss }: { children: ReactNode; onDismiss: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => dialog?.close();
+  }, []);
+
+  return createPortal(
+    <dialog
+      ref={ref}
+      data-agentom-ignore=""
+      onCancel={e => {
+        e.preventDefault();
+        onDismiss();
+      }}
+      style={{
+        width: 360,
+        padding: 16,
+        border: '1px solid rgba(127,127,127,.45)',
+        borderRadius: 10,
+        background: 'var(--base-color-1, #fff)',
+        color: 'var(--font-color, #111)',
+        font: '13px/1.45 system-ui, sans-serif',
+      }}
+    >
+      <div style={{ fontWeight: 600, marginBottom: 8 }}>Claude Haiku asks</div>
+      {children}
+    </dialog>,
+    document.body,
+  );
+}
+
 export function ChatPanel() {
   const { view, start, stop, clear, respond, enterSecret } = useClaude();
   const [open, setOpen] = useState(false);
@@ -55,6 +98,66 @@ export function ChatPanel() {
     setSeen(null);
     void start(q);
   };
+  const prompts = (
+    <>
+      {view.confirm && (
+        <Prompt onDismiss={() => respond(false)}>
+          <div style={{ marginBottom: 12 }}>{view.confirm}</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" style={primary} onClick={() => respond(true)}>
+              Allow
+            </button>
+            <button type="button" style={button} onClick={() => respond(false)}>
+              Decline
+            </button>
+          </div>
+        </Prompt>
+      )}
+      {view.secret && (
+        <Prompt
+          onDismiss={() => {
+            enterSecret(null);
+            setSecret('');
+          }}
+        >
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              enterSecret(secret);
+              setSecret('');
+            }}
+          >
+            <div style={{ marginBottom: 8 }}>
+              Enter the value for “{view.secret}”. It goes to the page, never to the model.
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="password"
+                value={secret}
+                onChange={e => setSecret(e.target.value)}
+                autoComplete="off"
+                autoFocus
+                style={{ ...button, flex: 1, cursor: 'text' }}
+              />
+              <button type="submit" style={primary}>
+                Enter
+              </button>
+              <button
+                type="button"
+                style={button}
+                onClick={() => {
+                  enterSecret(null);
+                  setSecret('');
+                }}
+              >
+                Decline
+              </button>
+            </div>
+          </form>
+        </Prompt>
+      )}
+    </>
+  );
   const toggleSeen = async () => {
     setSeen(seen === null ? await whatClaudeSees() : null);
   };
@@ -62,6 +165,7 @@ export function ChatPanel() {
   if (!open) {
     return (
       <aside data-agentom-ignore="" style={{ ...column, width: STRIP, alignItems: 'center' }}>
+        {prompts}
         <button
           type="button"
           style={{ ...primary, marginTop: 12, writingMode: 'vertical-rl', padding: '10px 6px' }}
@@ -75,6 +179,7 @@ export function ChatPanel() {
 
   return (
     <aside data-agentom-ignore="" style={{ ...column, width: WIDTH }}>
+      {prompts}
       <section
         style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
         aria-label="Agent"
@@ -132,55 +237,6 @@ export function ChatPanel() {
               ))}
               {view.reading && <div style={{ opacity: 0.7 }}>Reading {view.reading}…</div>}
               {view.thinking && <div style={{ opacity: 0.7 }}>Thinking…</div>}
-              {view.confirm && (
-                <div style={box}>
-                  <div style={{ marginBottom: 8 }}>{view.confirm}</div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="button" style={primary} onClick={() => respond(true)}>
-                      Allow
-                    </button>
-                    <button type="button" style={button} onClick={() => respond(false)}>
-                      Decline
-                    </button>
-                  </div>
-                </div>
-              )}
-              {view.secret && (
-                <form
-                  style={box}
-                  onSubmit={e => {
-                    e.preventDefault();
-                    enterSecret(secret);
-                    setSecret('');
-                  }}
-                >
-                  <div style={{ marginBottom: 8 }}>
-                    Enter the value for “{view.secret}”. It goes to the page, never to the model.
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input
-                      type="password"
-                      value={secret}
-                      onChange={e => setSecret(e.target.value)}
-                      autoComplete="off"
-                      style={{ ...button, flex: 1, cursor: 'text' }}
-                    />
-                    <button type="submit" style={primary}>
-                      Enter
-                    </button>
-                    <button
-                      type="button"
-                      style={button}
-                      onClick={() => {
-                        enterSecret(null);
-                        setSecret('');
-                      }}
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </form>
-              )}
               {!running && view.status !== 'idle' && (
                 <div
                   style={{

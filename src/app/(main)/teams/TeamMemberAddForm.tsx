@@ -7,6 +7,7 @@ import {
   ListItem,
   Select,
 } from '@umami/react-zen';
+import { useId } from 'react';
 import { useMessages, useUpdateQuery } from '@/components/hooks';
 import { UserSelect } from '@/components/input/UserSelect';
 import { ROLES } from '@/lib/constants';
@@ -23,6 +24,7 @@ export function TeamMemberAddForm({
   onClose?: () => void;
 }) {
   const { t, labels, getErrorMessage } = useMessages();
+  const roleChoicesId = useId();
   const { mutateAsync, error, isPending } = useUpdateQuery(`/teams/${teamId}/users`);
 
   const handleSubmit = async (data: any) => {
@@ -46,12 +48,16 @@ export function TeamMemberAddForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} aria-label={t(labels.addMember)}>
+      {/* what the role select offers, named before it opens (guidelines 1.16) */}
+      <span id={roleChoicesId} hidden>
+        {`${t(labels.choices)}: ${roles.map(renderRole).join(', ')}`}
+      </span>
       <FormField name="userId" label={t(labels.username)} rules={{ required: 'Required' }}>
         <UserSelect teamId={teamId} />
       </FormField>
       <FormField name="role" label={t(labels.role)} rules={{ required: 'Required' }}>
-        <Select>
+        <Select buttonProps={{ 'aria-describedby': roleChoicesId }}>
           {roles.map(value => (
             <ListItem key={value} id={value}>
               {renderRole(value)}

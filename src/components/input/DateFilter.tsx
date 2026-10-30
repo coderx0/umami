@@ -119,7 +119,7 @@ export function DateFilter({
         onChange={handleChange}
         buttonProps={{
           ...props.buttonProps,
-          'aria-label': t(labels.dateRange),
+          'aria-label': props.buttonProps?.['aria-label'] ?? t(labels.dateRange),
           'aria-describedby': choicesId,
         }}
         renderValue={renderValue}

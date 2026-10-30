@@ -1,4 +1,6 @@
-import { Button, Dialog, DialogTrigger, Icon, Modal, Text } from '@umami/react-zen';
+import { Button, Icon, Modal, Text } from '@umami/react-zen';
+import { useState } from 'react';
+import { ControlledDialog } from '@/components/common/ControlledDialog';
 import { useLoginQuery, useMessages } from '@/components/hooks';
 import { Trash } from '@/components/icons';
 import { UserDeleteForm } from './UserDeleteForm';
@@ -14,22 +16,31 @@ export function UserDeleteButton({
 }) {
   const { t, labels } = useMessages();
   const { user } = useLoginQuery();
+  const [isOpen, setIsOpen] = useState(false);
 
+  // UserDeleteForm is the dialog itself, so it opens in a modal of its own
   return (
-    <DialogTrigger>
-      <Button isDisabled={userId === user?.id} data-test="button-delete">
+    <>
+      <Button
+        isDisabled={userId === user?.id}
+        data-test="button-delete"
+        onPress={() => setIsOpen(true)}
+      >
         <Icon size="sm">
           <Trash />
         </Icon>
         <Text>{t(labels.delete)}</Text>
       </Button>
-      <Modal>
-        <Dialog title={t(labels.deleteUser)} style={{ width: 400 }}>
-          {({ close }) => (
-            <UserDeleteForm userId={userId} username={username} onSave={onDelete} onClose={close} />
-          )}
-        </Dialog>
-      </Modal>
-    </DialogTrigger>
+      <ControlledDialog>
+        <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
+          <UserDeleteForm
+            userId={userId}
+            username={username}
+            onSave={onDelete}
+            onClose={() => setIsOpen(false)}
+          />
+        </Modal>
+      </ControlledDialog>
+    </>
   );
 }

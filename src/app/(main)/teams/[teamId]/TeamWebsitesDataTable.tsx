@@ -1,5 +1,5 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useTeamWebsitesQuery } from '@/components/hooks';
+import { useMessages, useTeamWebsitesQuery } from '@/components/hooks';
 import { TeamWebsitesTable } from './TeamWebsitesTable';
 
 export function TeamWebsitesDataTable({
@@ -11,8 +11,10 @@ export function TeamWebsitesDataTable({
 }) {
   const queryResult = useTeamWebsitesQuery(teamId);
 
+  const { t, messages } = useMessages();
+
   return (
-    <DataGrid query={queryResult} allowSearch>
+    <DataGrid query={queryResult} allowSearch searchDescription={t(messages.websitesSearchRule)}>
       {({ data }) => <TeamWebsitesTable data={data} teamId={teamId} allowEdit={allowEdit} />}
     </DataGrid>
   );

@@ -1,5 +1,5 @@
 import { Button, ListItem, Row, Select } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useMessages, useTimezone } from '@/components/hooks';
 import { getTimezone } from '@/lib/date';
 
@@ -7,7 +7,8 @@ const timezones = Intl.supportedValuesOf('timeZone');
 
 export function TimezoneSetting() {
   const [search, setSearch] = useState('');
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const hintId = useId();
   const { timezone, saveTimezone } = useTimezone();
   const items = search
     ? timezones.filter(n => n.toLowerCase().includes(search.toLowerCase()))
@@ -23,6 +24,10 @@ export function TimezoneSetting() {
 
   return (
     <Row gap>
+      {/* what the select offers: too many time zones to list (guidelines 1.16) */}
+      <span id={hintId} hidden>
+        {t(messages.timezoneSearchRule)}
+      </span>
       <Select
         value={timezone}
         onChange={(value: any) => saveTimezone(value)}
@@ -30,7 +35,11 @@ export function TimezoneSetting() {
         onSearch={setSearch}
         onOpenChange={handleOpen}
         maxHeight={480}
-        buttonProps={{ style: { minWidth: '250px' } }}
+        buttonProps={{
+          style: { minWidth: '250px' },
+          'aria-label': t(labels.timezone),
+          'aria-describedby': hintId,
+        }}
       >
         {items.map((item: any) => (
           <ListItem key={item} id={item}>
@@ -39,7 +48,12 @@ export function TimezoneSetting() {
         ))}
         {!items.length && <ListItem></ListItem>}
       </Select>
-      <Button onPress={handleReset}>{t(labels.reset)}</Button>
+      <Button
+        onPress={handleReset}
+        aria-label={t(labels.resetSetting, { setting: t(labels.timezone) })}
+      >
+        {t(labels.reset)}
+      </Button>
     </Row>
   );
 }

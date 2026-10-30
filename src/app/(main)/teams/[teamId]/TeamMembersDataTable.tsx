@@ -1,5 +1,5 @@
 import { DataGrid } from '@/components/common/DataGrid';
-import { useTeamMembersQuery } from '@/components/hooks';
+import { useMessages, useTeamMembersQuery } from '@/components/hooks';
 import { TeamMembersTable } from './TeamMembersTable';
 
 export function TeamMembersDataTable({
@@ -11,8 +11,10 @@ export function TeamMembersDataTable({
 }) {
   const queryResult = useTeamMembersQuery(teamId);
 
+  const { t, messages } = useMessages();
+
   return (
-    <DataGrid query={queryResult} allowSearch>
+    <DataGrid query={queryResult} allowSearch searchDescription={t(messages.membersSearchRule)}>
       {({ data }) => <TeamMembersTable data={data} teamId={teamId} allowEdit={allowEdit} />}
     </DataGrid>
   );

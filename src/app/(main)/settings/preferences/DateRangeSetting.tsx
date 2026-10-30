@@ -24,9 +24,17 @@ export function DateRangeSetting() {
       <DateFilter
         value={date}
         onChange={handleChange}
-        buttonProps={{ style: { minWidth: '250px' } }}
+        buttonProps={{
+          style: { minWidth: '250px' },
+          'aria-label': t(labels.defaultDateRange),
+        }}
       />
-      <Button onPress={handleReset}>{t(labels.reset)}</Button>
+      <Button
+        onPress={handleReset}
+        aria-label={t(labels.resetSetting, { setting: t(labels.defaultDateRange) })}
+      >
+        {t(labels.reset)}
+      </Button>
     </Row>
   );
 }

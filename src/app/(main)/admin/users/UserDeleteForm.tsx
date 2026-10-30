@@ -1,4 +1,5 @@
-import { AlertDialog, Row } from '@umami/react-zen';
+import { Dialog } from '@umami/react-zen';
+import { ConfirmationForm } from '@/components/common/ConfirmationForm';
 import { useDeleteQuery, useMessages, useModified } from '@/components/hooks';
 
 export function UserDeleteForm({
@@ -12,8 +13,8 @@ export function UserDeleteForm({
   onSave?: () => void;
   onClose?: () => void;
 }) {
-  const { messages, labels, t } = useMessages();
-  const { mutateAsync } = useDeleteQuery(`/users/${userId}`);
+  const { messages, labels, t, getErrorMessage } = useMessages();
+  const { mutateAsync, isPending, error } = useDeleteQuery(`/users/${userId}`);
   const { touch } = useModified();
 
   const handleConfirm = async () => {
@@ -27,15 +28,18 @@ export function UserDeleteForm({
     });
   };
 
+  // a confirmation whose button is marked destructive (guidelines 4.1)
   return (
-    <AlertDialog
-      title={t(labels.delete)}
-      onConfirm={handleConfirm}
-      onCancel={onClose}
-      confirmLabel={t(labels.delete)}
-      isDanger
-    >
-      <Row gap="1">{t(messages.confirmDelete, { target: username })}</Row>
-    </AlertDialog>
+    <Dialog title={t(labels.deleteUser)} style={{ width: 400 }}>
+      <ConfirmationForm
+        message={t(messages.confirmDelete, { target: username })}
+        isLoading={isPending}
+        error={getErrorMessage(error)}
+        onConfirm={handleConfirm}
+        onClose={onClose}
+        buttonLabel={t(labels.delete)}
+        buttonVariant="danger"
+      />
+    </Dialog>
   );
 }

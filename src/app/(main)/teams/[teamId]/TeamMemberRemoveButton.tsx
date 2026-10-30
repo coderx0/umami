@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { ConfirmationForm } from '@/components/common/ConfirmationForm';
 import { useDeleteQuery, useMessages, useModified } from '@/components/hooks';
 import { Trash } from '@/components/icons';
@@ -18,6 +19,7 @@ export function TeamMemberRemoveButton({
   const { t, labels, messages } = useMessages();
   const { mutateAsync, isPending, error } = useDeleteQuery(`/teams/${teamId}/users/${userId}`);
   const { touch } = useModified();
+  const confirmId = useId();
 
   const handleConfirm = async (close: () => void) => {
     await mutateAsync(null, {
@@ -30,21 +32,35 @@ export function TeamMemberRemoveButton({
   };
 
   return (
-    <DialogButton icon={<Trash />} title={t(labels.confirm)} variant="quiet" width="400px">
-      {({ close }) => (
-        <ConfirmationForm
-          message={t.rich(messages.confirmRemove, {
-            target: userName,
-            b: chunks => <b>{chunks}</b>,
-          })}
-          isLoading={isPending}
-          error={error}
-          onConfirm={handleConfirm.bind(null, close)}
-          onClose={close}
-          buttonLabel={t(labels.remove)}
-          buttonVariant="danger"
-        />
-      )}
-    </DialogButton>
+    <>
+      {/* what it asks before removing (it opens a confirmation, guidelines 1.16) */}
+      <span id={confirmId} hidden>
+        {t.rich(messages.confirmRemove, { target: userName, b: chunks => <b>{chunks}</b> })}
+      </span>
+      <DialogButton
+        icon={<Trash />}
+        title={t(labels.confirm)}
+        variant="quiet"
+        width="400px"
+        aria-label={t(labels.removeMember)}
+        aria-describedby={confirmId}
+        data-agentom-id={`member.${userId}.remove`}
+      >
+        {({ close }) => (
+          <ConfirmationForm
+            message={t.rich(messages.confirmRemove, {
+              target: userName,
+              b: chunks => <b>{chunks}</b>,
+            })}
+            isLoading={isPending}
+            error={error}
+            onConfirm={handleConfirm.bind(null, close)}
+            onClose={close}
+            buttonLabel={t(labels.remove)}
+            buttonVariant="danger"
+          />
+        )}
+      </DialogButton>
+    </>
   );
 }

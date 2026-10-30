@@ -23,7 +23,7 @@ export function TeamJoinForm({ onSave, onClose }: { onSave: () => void; onClose:
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} aria-label={t(labels.joinTeam)}>
       <FormField
         label={t(labels.accessCode)}
         name="accessCode"

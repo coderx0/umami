@@ -153,7 +153,10 @@ export function TwoFactorSetupModal({ required, onClose }: TwoFactorSetupModalPr
                       <Text weight="bold">{t(labels.twoFactorCantScan)}</Text>
                       <Column gap="2">
                         <Text size="sm">{t(labels.twoFactorManualEntry)}</Text>
-                        <Code>{manualKey}</Code>
+                        {/* the secret key never goes into the projection (guidelines 4.5) */}
+                        <div data-agentom-ignore="">
+                          <Code>{manualKey}</Code>
+                        </div>
                         <div>
                           <Button variant="outline" onPress={handleCopy}>
                             <Icon size="sm">

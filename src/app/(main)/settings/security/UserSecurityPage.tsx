@@ -1,7 +1,7 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Column, Row, Switch, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Badge } from '@/components/common/Badge';
 import { PageBody } from '@/components/common/PageBody';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -16,6 +16,7 @@ export function UserSecurityPage() {
   const queryClient = useQueryClient();
   const [showSetup, setShowSetup] = useState(false);
   const [showDisable, setShowDisable] = useState(false);
+  const descriptionId = useId();
 
   const isEnabled = status?.isEnabled ?? false;
   const isRequired = status?.isRequired ?? false;
@@ -58,11 +59,11 @@ export function UserSecurityPage() {
             </Row>
 
             {showConfigurationError ? (
-              <Text>{t(messages.twoFactorErrorNotConfigured)}</Text>
+              <Text id={descriptionId}>{t(messages.twoFactorErrorNotConfigured)}</Text>
             ) : isEnabled ? (
-              <Text>{t(messages.twoFactorActiveDescription)}</Text>
+              <Text id={descriptionId}>{t(messages.twoFactorActiveDescription)}</Text>
             ) : (
-              <Text>{t(messages.twoFactorUserDescription)}</Text>
+              <Text id={descriptionId}>{t(messages.twoFactorUserDescription)}</Text>
             )}
 
             {isConfigured === true && isEnabled && isRequired ? (
@@ -72,10 +73,13 @@ export function UserSecurityPage() {
                     isSelected={isEnabled}
                     isDisabled={isEnabled && isRequired}
                     onChange={handleToggle}
+                    aria-label={t(labels.twoFactorEnable)}
+                    aria-describedby={descriptionId}
+                    data-agentom-id="security.two-factor"
                   />
                   <Text>{t(labels.twoFactorEnable)}</Text>
                 </Row>
-                  <Tooltip>{t(messages.twoFactorRequiredMessage)}</Tooltip>
+                <Tooltip>{t(messages.twoFactorRequiredMessage)}</Tooltip>
               </TooltipTrigger>
             ) : null}
 
@@ -85,6 +89,9 @@ export function UserSecurityPage() {
                   isSelected={isEnabled}
                   isDisabled={isEnabled && isRequired}
                   onChange={handleToggle}
+                  aria-label={t(labels.twoFactorEnable)}
+                  aria-describedby={descriptionId}
+                  data-agentom-id="security.two-factor"
                 />
                 <Text>{t(labels.twoFactorEnable)}</Text>
               </Row>
@@ -96,6 +103,9 @@ export function UserSecurityPage() {
                   isSelected={isEnabled}
                   isDisabled={isEnabled && isRequired}
                   onChange={handleToggle}
+                  aria-label={t(labels.twoFactorEnable)}
+                  aria-describedby={descriptionId}
+                  data-agentom-id="security.two-factor"
                 />
                 <Text>{t(labels.twoFactorEnable)}</Text>
               </Row>

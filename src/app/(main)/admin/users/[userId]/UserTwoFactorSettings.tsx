@@ -11,7 +11,7 @@ import {
   Tooltip,
   TooltipTrigger,
 } from '@umami/react-zen';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Badge } from '@/components/common/Badge';
 import { ControlledDialog } from '@/components/common/ControlledDialog';
 import { TypeConfirmationForm } from '@/components/common/TypeConfirmationForm';
@@ -54,6 +54,8 @@ export function UserTwoFactorSettings({ userId }: { userId: string }) {
     queryClient.invalidateQueries({ queryKey: ['users', { userId }] });
   };
 
+  const descriptionId = useId();
+  const resetHintId = useId();
   const isToggleDisabled = isGlobalRequired || (!isConfigured && !twoFactorRequired);
   const toggle = (
     <Row alignItems="center" gap="3">
@@ -61,6 +63,10 @@ export function UserTwoFactorSettings({ userId }: { userId: string }) {
         isSelected={isGlobalRequired || twoFactorRequired}
         isDisabled={isToggleDisabled}
         onChange={handleToggle}
+        aria-label={t(labels.twoFactorRequireUser)}
+        aria-describedby={descriptionId}
+        data-agentom-id="user.require-two-factor"
+        data-agentom-risk="sensitive"
       />
       <Text>{t(labels.twoFactorRequireUser)}</Text>
     </Row>
@@ -85,7 +91,7 @@ export function UserTwoFactorSettings({ userId }: { userId: string }) {
           </Badge>
         </Row>
 
-        <Text size="sm" color="muted">
+        <Text size="sm" color="muted" id={descriptionId}>
           {t(messages.twoFactorRequireUserDescription)}
         </Text>
 
@@ -107,11 +113,18 @@ export function UserTwoFactorSettings({ userId }: { userId: string }) {
         {twoFactorEnabled && (
           <Column gap="3">
             <Text weight="bold">{t(labels.twoFactorReset)}</Text>
-            <Text size="sm" color="muted">
+            <Text size="sm" color="muted" id={resetHintId}>
               {t(messages.twoFactorResetDescription)}
             </Text>
             <Row>
-              <Button size="sm" variant="danger" onPress={() => setShowReset(true)}>
+              <Button
+                size="sm"
+                variant="danger"
+                onPress={() => setShowReset(true)}
+                aria-label={t(labels.twoFactorReset)}
+                aria-describedby={resetHintId}
+                data-agentom-id="user.reset-two-factor"
+              >
                 {t(labels.reset)}
               </Button>
             </Row>

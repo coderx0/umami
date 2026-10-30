@@ -39,7 +39,8 @@ export function ApiKeyAddForm({ onSave, onClose }: { onSave: () => void; onClose
           </Icon>
           <AlertTitle>{t(messages.apiKeyCreated)}</AlertTitle>
         </Alert>
-        <Row alignItems="center" gap="2">
+        {/* the key is a secret: its value never goes into the projection (guidelines 4.5) */}
+        <Row alignItems="center" gap="2" data-agentom-redact="">
           <TextField value={createdKey} isReadOnly style={{ flex: 1, fontFamily: 'monospace' }} />
           <CopyButton value={createdKey} label={t(labels.copy)} />
         </Row>
@@ -53,7 +54,11 @@ export function ApiKeyAddForm({ onSave, onClose }: { onSave: () => void; onClose
   }
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form
+      onSubmit={handleSubmit}
+      error={getErrorMessage(error)}
+      aria-label={t(labels.createApiKey)}
+    >
       <FormField name="name" label={t(labels.name)}>
         <TextField autoComplete="off" autoFocus />
       </FormField>

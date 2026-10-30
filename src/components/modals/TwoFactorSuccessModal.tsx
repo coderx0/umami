@@ -42,7 +42,8 @@ export function TwoFactorSuccessModal({ backupCodes, onClose }: TwoFactorSuccess
                 <Text weight="bold">{t(labels.twoFactorSaveBackupCodes)}</Text>
                 <Text>{t(messages.twoFactorBackupDescription)}</Text>
 
-                <div className={styles.codesGrid}>
+                {/* the backup codes never go into the projection (guidelines 4.5) */}
+                <div className={styles.codesGrid} data-agentom-ignore="">
                   {backupCodes.map((code, i) => (
                     <code key={i} className={styles.code}>
                       {code}

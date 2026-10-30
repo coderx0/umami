@@ -1,6 +1,7 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Column, Row, Switch, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
+import { useId } from 'react';
 import {
   useMessages,
   useTeamQuery,
@@ -27,6 +28,7 @@ export function TeamTwoFactorSettings({ teamId }: { teamId: string }) {
     queryClient.invalidateQueries({ queryKey: ['teams', { teamId }] });
   };
 
+  const descriptionId = useId();
   const isToggleDisabled = isGlobalRequired || (!isConfigured && !twoFactorRequired);
   const toggle = (
     <Row alignItems="center" gap="3">
@@ -34,6 +36,10 @@ export function TeamTwoFactorSettings({ teamId }: { teamId: string }) {
         isSelected={isGlobalRequired || twoFactorRequired}
         isDisabled={isToggleDisabled}
         onChange={handleToggle}
+        aria-label={t(labels.twoFactorRequireTeam)}
+        aria-describedby={descriptionId}
+        data-agentom-id="team.require-two-factor"
+        data-agentom-risk="sensitive"
       />
       <Text>{t(labels.twoFactorRequireTeam)}</Text>
     </Row>
@@ -58,7 +64,7 @@ export function TeamTwoFactorSettings({ teamId }: { teamId: string }) {
         toggle
       )}
 
-      <Text size="sm" color="muted">
+      <Text size="sm" color="muted" id={descriptionId}>
         {t(messages.twoFactorRequireTeamDescription)}
       </Text>
     </Column>

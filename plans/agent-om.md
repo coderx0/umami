@@ -112,18 +112,69 @@ text view reads right; and a task on it works by hand in the chat.
 - [x] `performance` (the seed has no web vitals: checked with zeros)
 - [x] `heatmaps` (the seed has no heatmap data: only its controls checked)
 
-Not yet done for Reports: a task by hand in the chat on each page.
+A task in the chat on each report page (2026-10-30, after the agent-om fixes
+for table headers, toggle descriptions and dialog buttons): 12 tasks, all
+answered or done right, checked against the pages and the database; $0.022 in
+all. Goals, funnels, journeys, retention, breakdown, attribution, UTM and
+revenue answered; performance and heatmaps said there's no data (true of the
+seed); a goal ("Signup started") and a funnel ("Pricing to signup", 30
+minutes) were created through their dialogs. Slips it recovered from: a click
+on a control covered by an open list (attribution), and twice an id that
+isn't on the page (`combobox:date-range` for `filter.date-range`). After
+switching to All time on Performance, Claude saw the website picker read
+"Select website" for a moment: not looked into.
 
 **Settings, admin, teams**
-- [ ] `/settings/profile`, `/settings/preferences`, `/settings/security`,
-      `/settings/api-keys`
-- [ ] `/settings/websites`, `/settings/websites/[websiteId]`
-- [ ] `/settings/teams`, `/settings/teams/[teamId]`
-- [ ] `/teams`
-- [ ] `/admin/users`, `/admin/users/[userId]`
-- [ ] `/admin/websites`, `/admin/websites/[websiteId]`
-- [ ] `/admin/teams`, `/admin/teams/[teamId]`
-- [ ] `/admin/security`
+- [x] `/settings/profile`, `/settings/preferences`, `/settings/security`,
+      `/settings/api-keys` (with their dialogs; 2FA's backup codes not seen:
+      turning 2FA on would change every script's sign-in)
+- [x] `/settings/websites`, `/settings/websites/[websiteId]`
+- [x] `/settings/teams`, `/settings/teams/[teamId]` (a team, "Growth team",
+      was created through the dialog; its member rows unchecked: it has one
+      member, its owner)
+- [x] `/teams`
+
+A task in the chat on Settings and admin pages (2026-10-31): 14 tasks, about
+$0.012 with the reruns, checked against the pages and the database. Answered
+right: the account's role, its 2FA status, the users and analyst's role, the
+websites admin owns. Done right: the timezone set to Europe/Berlin, a team
+created and deleted, an API key created and deleted, analyst's role changed to
+User (Save asked first: sensitive) and in the team to View only. Asked for the
+new API key and for the team's access code, Claude said it can't read them
+(redacted) and pointed to the Copy button. Whether 2FA is required for all
+users: at first Claude couldn't tell from "turn on switch 'Require 2FA for
+all users'"; after the agent-om fix below, it answered (the switch is off). "Reset timezone" ran in a fresh browser, where the zone was already
+the browser's, so it showed nothing.
+
+The chat's own prompts couldn't be answered while a page dialog was open: the
+app's modal backdrop (and Base UI's guard under it) cover the chat column, and
+the app's root, the chat inside it, is marked aria-hidden. Both deletes waited
+on "Go ahead?" until they timed out. The question to the user (a risky step,
+a secret) is now a native modal dialog put in <body>: the top layer is above
+the app's modal, and the app's dialog stays open and usable after it.
+
+Also: the row menus of the admin tables (`MenuButton`) say they open a menu
+(`aria-haspopup="menu"` over its dialog trigger) and what's in it; deleting a
+user now asks with `ConfirmationForm` (marked destructive) instead of
+react-zen's `AlertDialog`; the switches that require 2FA (for everyone, a
+team, a user) and saving a user (password and role) are marked sensitive.
+
+Secrets Settings showed to the projection, now kept out (each checked against
+the projection with the value on the page):
+- the confirm-password field's `autocomplete="confirm-password"` isn't a
+  token, so with "Show password" on its value was projected; now
+  `new-password`;
+- the 2FA setup key, shown as text for manual entry, and the backup codes
+  shown after setup: inside `data-agentom-ignore`;
+- a new API key, shown once in a read-only field, and the team's access code
+  (anyone holding it can join the team): `data-agentom-redact`. The agent
+  can't read the access code out to the user; the Copy button still works.
+- [x] `/admin/users`, `/admin/users/[userId]` (a view-only user, "analyst",
+      was created through the dialog)
+- [x] `/admin/websites`, `/admin/websites/[websiteId]`
+- [x] `/admin/teams`, `/admin/teams/[teamId]` (analyst was added to Growth
+      team as a member through the dialog)
+- [x] `/admin/security`
 
 **Boards, links, pixels, console**
 - [ ] `/boards`, `/boards/create`, `/boards/[boardId]`, `/edit`, `/design`
@@ -172,6 +223,12 @@ segments as path templates), per `../agent-om/docs/sitemap.md`; checked with
   option left out its description (`candidates.ts`: text fields and clicks
   added `describedOf`, toggles didn't), so Claude didn't see the journey
   nodes' counts. Fixed on the same branch, re-packed here.
+- **Finding for agent-om (the agent's view), fixed there:** a switch that
+  was off wasn't said to be off: the outline leaves it out and its option read
+  "turn on switch …". Asked whether 2FA is required for all users, Claude
+  (Haiku) said it couldn't tell. Its option now says "(off)"; asked again, it
+  answered that the switch is off. Fixed on `fix/aria-header-row-and-view`,
+  re-packed here.
 - **Finding for agent-om (the agent's view), fixed there:** a control with
   `aria-haspopup="dialog"` was offered as "opens its list"; it now says
   "opens a dialog". Fixed on the same branch, re-packed here.

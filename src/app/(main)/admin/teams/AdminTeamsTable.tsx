@@ -64,7 +64,11 @@ export function AdminTeamsTable({
               const { id } = row;
 
               return (
-                <MenuButton>
+                <MenuButton
+                  label={`${t(labels.actions)}: ${row.name}`}
+                  description={`${t(labels.actions)}: ${t(labels.edit)}, ${t(labels.delete)}`}
+                  id={`team.${id}.actions`}
+                >
                   <MenuItem
                     onAction={() => router.push(`/admin/teams/${id}`)}
                     data-test="link-button-edit"
@@ -96,7 +100,7 @@ export function AdminTeamsTable({
       </DataTable>
       <ControlledDialog>
         <Modal isOpen={!!deleteTeam}>
-          <Dialog style={{ width: 400 }}>
+          <Dialog title={t(labels.deleteTeam)} style={{ width: 400 }}>
             <TeamDeleteForm teamId={deleteTeam} onClose={() => setDeleteTeam(null)} />
           </Dialog>
         </Modal>
