@@ -375,7 +375,7 @@ packages:
     version: 0.0.0
 
   '@agent-om/agent@file:vendor/agent-om/agent-om-agent-0.0.0.tgz':
-    resolution: {integrity: sha512-LzgogXd+29RDGCw8GYor4QVI19TveTHOqKKswYYOehnj8+FQvDkAojVdgqKheLKtic/XAfccirIdc9lqevYvqA==, tarball: file:vendor/agent-om/agent-om-agent-0.0.0.tgz}
+    resolution: {integrity: sha512-98B3+AXRmNv2k0tJre2YI3MGv4sHPLYrNz/soGcZfAzrzMu1UngQ7knKN7NdfL7TLAVqmMYi3H9mn1e/PYStbA==, tarball: file:vendor/agent-om/agent-om-agent-0.0.0.tgz}
     version: 0.0.0
 
   '@agent-om/core@file:vendor/agent-om/agent-om-core-0.0.0.tgz':

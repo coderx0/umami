@@ -313,12 +313,16 @@ Not done: hints (`holds`, what each page holds), by the crawler in
   text field (`state.readonly`) was still offered as `type`. It isn't
   offered now; its value is in the outline. Fixed on
   `fix/aria-header-row-and-view` (test fails without it), re-packed here.
-- **Finding for agent-om (core's row cap and the agent's read), not changed
-  here:** a table holds at most 50 rows in the projection (`totalRows` has
-  the full count), and reading one says "(50 on the page)", though the page
-  has them all. On the link share's Last 90 days, the traffic table has 91
-  days (Aug 2 – Oct 31); Claude read the 50 and said the range ran to
-  Sep 20. Its answer (0 visitors) was right.
+- **Finding for agent-om (core's row cap and the agent's read):** a table
+  holds at most 50 rows in the projection (`totalRows` has the full count),
+  and reading one said "(50 on the page)", though the page has them all. On
+  the link share's Last 90 days, the traffic table has 91 days (Aug 2 –
+  Oct 31); Claude read the 50 and said the range ran to Sep 20. Its answer
+  (0 visitors) was right. The read now says "the first 50 of 91 rows", and
+  after them that the other 41 can't be read (agent-om,
+  `fix/aria-header-row-and-view`, test fails without it; re-packed here).
+  Rerun: right, "no visits on any day I could read", no range claimed. The
+  cap itself is unchanged (the user is working out large data).
 - **Finding for agent-om (the agent's view), fixed there:** a toggle's
   option left out its description (`candidates.ts`: text fields and clicks
   added `describedOf`, toggles didn't), so Claude didn't see the journey
