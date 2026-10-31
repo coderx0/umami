@@ -22,8 +22,9 @@ export function TeamMembersTable({
     [ROLES.teamViewOnly]: t(labels.viewOnly),
   };
 
+  // the table named, and each row's buttons by the member they act on (guidelines 1.3)
   return (
-    <DataTable data={data}>
+    <DataTable data={data} aria-label={t(labels.members)}>
       <DataColumn id="username" label={t(labels.username)}>
         {(row: any) => row?.user?.username}
       </DataColumn>
@@ -39,7 +40,12 @@ export function TeamMembersTable({
 
             return (
               <Row alignItems="center" maxHeight="20px">
-                <TeamMemberEditButton teamId={teamId} userId={row?.user?.id} role={row?.role} />
+                <TeamMemberEditButton
+                  teamId={teamId}
+                  userId={row?.user?.id}
+                  userName={row?.user?.username}
+                  role={row?.role}
+                />
                 <TeamMemberRemoveButton
                   teamId={teamId}
                   userId={row?.user?.id}

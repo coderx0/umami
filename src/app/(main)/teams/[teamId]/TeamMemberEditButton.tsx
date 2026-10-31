@@ -8,11 +8,14 @@ import { TeamMemberEditForm } from './TeamMemberEditForm';
 export function TeamMemberEditButton({
   teamId,
   userId,
+  userName,
   role,
   onSave,
 }: {
   teamId: string;
   userId: string;
+  /** says which member it edits, where there are several */
+  userName?: string;
   role: string;
   onSave?: () => void;
 }) {
@@ -38,7 +41,7 @@ export function TeamMemberEditButton({
         title={t(labels.editMember)}
         variant="quiet"
         width="400px"
-        aria-label={t(labels.editMember)}
+        aria-label={userName ? `${t(labels.editMember)}: ${userName}` : t(labels.editMember)}
         aria-describedby={hintId}
         data-agentom-id={`member.${userId}.edit`}
       >

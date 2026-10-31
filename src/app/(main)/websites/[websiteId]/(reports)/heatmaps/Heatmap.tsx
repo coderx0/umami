@@ -14,7 +14,7 @@ import {
   Text,
 } from '@umami/react-zen';
 import { Laptop, Monitor, Smartphone, Tablet } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ControlledDialog } from '@/components/common/ControlledDialog';
 import { IconLabel } from '@/components/common/IconLabel';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
@@ -273,20 +273,29 @@ function PageList({
 
     return `${formatLongNumber(page.sessions)} visitors - ${formatLongNumber(page.count)} ${metricLabel}`;
   };
+  const metricsId = useId();
 
+  // each page named by its path, with its counts as its description, and the
+  // one shown marked current (guidelines 1.3): the number alone didn't say what it counts
   return (
     <Column className={styles.pageList} gap="1">
       {showHeading && <Heading size="lg">Pages</Heading>}
       <Column className={styles.pageListItems} gap="2">
         {pages.length === 0 && hasSearch && <Text color="muted">No matching pages</Text>}
-        {pages.map(page => (
+        {pages.map((page, i) => (
           <button
             key={page.urlPath}
             type="button"
             onClick={() => onSelect(page.urlPath)}
             title={page.urlPath}
+            aria-label={page.urlPath}
+            aria-describedby={`${metricsId}-${i}`}
+            aria-current={selected === page.urlPath ? 'true' : undefined}
             className={`${styles.pageButton} ${selected === page.urlPath ? styles.pageButtonSelected : ''}`}
           >
+            <span id={`${metricsId}-${i}`} hidden>
+              {getPageMetricTitle(page)}
+            </span>
             <Row alignItems="center" justifyContent="space-between" gap="2">
               <Text truncate>{page.urlPath}</Text>
               <Text color="muted" className={styles.pageMetric} title={getPageMetricTitle(page)}>
@@ -564,6 +573,7 @@ function ScreenWidthSelect({
     () => new Map(buckets.map(bucket => [bucket.width, bucket])),
     [buckets],
   );
+  const choicesId = useId();
 
   if (!value || buckets.length === 0) {
     return null;
@@ -574,6 +584,12 @@ function ScreenWidthSelect({
       <Text color="muted" className={styles.screenWidthLabel}>
         Screen width:
       </Text>
+      {/* named, with the widths that have data as its choices (guidelines 1.3) */}
+      <span id={choicesId} hidden>
+        {`Choices: ${SCREEN_WIDTH_BUCKETS.filter(width => bucketsByWidth.has(width))
+          .map(width => `${width} px`)
+          .join(', ')}`}
+      </span>
       <Select
         aria-label="Screen width"
         value={value}
@@ -581,6 +597,8 @@ function ScreenWidthSelect({
         maxHeight={420}
         renderValue={() => <ScreenWidthValue width={value} />}
         buttonProps={{
+          'aria-label': 'Screen width',
+          'aria-describedby': choicesId,
           style: {
             minHeight: 36,
             minWidth: 132,

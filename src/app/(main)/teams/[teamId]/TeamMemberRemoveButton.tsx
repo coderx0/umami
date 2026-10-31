@@ -42,7 +42,7 @@ export function TeamMemberRemoveButton({
         title={t(labels.confirm)}
         variant="quiet"
         width="400px"
-        aria-label={t(labels.removeMember)}
+        aria-label={`${t(labels.removeMember)}: ${userName}`}
         aria-describedby={confirmId}
         data-agentom-id={`member.${userId}.remove`}
       >

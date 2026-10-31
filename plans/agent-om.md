@@ -167,7 +167,14 @@ above). Open the saved replay and play it at 2x: right, Play pressed.
       available.": telling them apart would change the page's look)
 - [x] `revenue`
 - [x] `performance` (the seed has no web vitals: checked with zeros)
-- [x] `heatmaps` (the seed has no heatmap data: only its controls checked)
+- [x] `heatmaps` (checked again with data, 2026-10-31: the recorded visits'
+      clicks and scrolls. Each page in the list read "/index.html 2", the
+      number its visitors, unsaid; it's named by its path now, with "2
+      visitors - 2 clicks" as its description and the one shown current.
+      The screen width select had no name or choices; now it lists the
+      widths with data. A task in the chat: the pages, their clicks and the
+      signup page's width, right, checked against the database (1280 px
+      shows as Umami's nearest width, 1440 px), $0.0016)
 
 A task in the chat on each report page (2026-10-30, after the agent-om fixes
 for table headers, toggle descriptions and dialog buttons): 12 tasks, all
@@ -187,8 +194,15 @@ switching to All time on Performance, Claude saw the website picker read
       turning 2FA on would change every script's sign-in)
 - [x] `/settings/websites`, `/settings/websites/[websiteId]`
 - [x] `/settings/teams`, `/settings/teams/[teamId]` (a team, "Growth team",
-      was created through the dialog; its member rows unchecked: it has one
-      member, its owner)
+      was created through the dialog; its member rows checked once analyst
+      had joined it, below)
+
+Team members (2026-10-31, Growth team with its owner and analyst, on the
+settings and admin team pages): the members table had no name, and each
+row's buttons read "Edit member" and "Remove member", the same on every
+row. The table is "Members" and the buttons say whose ("Edit member:
+analyst"). A task in the chat: analyst's role changed to Member, right (one
+slip: a `select` on the custom select), $0.0014.
 - [x] `/teams`
 
 A task in the chat on Settings and admin pages (2026-10-31): 14 tasks, about
