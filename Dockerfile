@@ -15,6 +15,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/api-client/package.json ./packages/api-client/
 COPY packages/mcp/package.json ./packages/mcp/
 COPY packages/mcp/bin ./packages/mcp/bin/
+# The Agent Object Model's packages, packed (scripts/agent-om-pack.sh): installed from here.
+COPY vendor/agent-om ./vendor/agent-om/
 RUN npm install -g pnpm@${PNPM_VERSION}
 
 RUN printf 'strictDepBuilds: false\n' >> pnpm-workspace.yaml
@@ -34,8 +36,11 @@ COPY . .
 COPY docker/proxy.ts ./src
 
 ARG BASE_PATH
+# AGENT_OM=off builds without the Agent Object Model's projector (next.config.ts).
+ARG AGENT_OM
 
 ENV BASE_PATH=$BASE_PATH
+ENV AGENT_OM=$AGENT_OM
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
 
