@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider, ZenProvider } from '@umami/react-zen';
 import { NextIntlClientProvider } from 'next-intl';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { AgentOm } from '@/agent-om/AgentOm';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useLocale } from '@/components/hooks';
@@ -33,15 +33,18 @@ function MessagesProvider({ children }) {
   );
 }
 
+// AGENT_OM=off at build time: no projector (next.config.ts)
+const AgentOmOrNot = process.env.agentOm === 'off' ? Fragment : AgentOm;
+
 export function Providers({ children }) {
   return (
     <ZenProvider>
       <RouterProvider>
         <MessagesProvider>
           <QueryClientProvider client={client}>
-            <AgentOm>
+            <AgentOmOrNot>
               <ErrorBoundary>{children}</ErrorBoundary>
-            </AgentOm>
+            </AgentOmOrNot>
           </QueryClientProvider>
         </MessagesProvider>
       </RouterProvider>

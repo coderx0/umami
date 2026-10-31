@@ -24,6 +24,9 @@ const trackerScriptName = process.env.TRACKER_SCRIPT_NAME || '';
 const trackerScriptURL = process.env.TRACKER_SCRIPT_URL || '';
 const selfTrack = process.env.UMAMI_SELF_TRACK || '';
 const selfRecord = process.env.UMAMI_SELF_RECORD || '';
+// AGENT_OM=off builds the app without the Agent Object Model's projector and
+// sitemap link: the guideline markup only, as agents other than ours see it.
+const agentOm = process.env.AGENT_OM || '';
 
 function isRelativeUrl(url: string) {
   return Boolean(url && !/^https?:\/\//i.test(url));
@@ -221,6 +224,7 @@ export default withNextIntl({
     defaultLocale,
     selfTrack,
     selfRecord,
+    agentOm,
     // The agent-om chat's Anthropic key reaches the browser in dev mode only.
     agentOmAnthropicKey: isProd ? '' : process.env.ANTHROPIC_API_KEY || '',
   },
