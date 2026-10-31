@@ -1,0 +1,74 @@
+{
+  "/admin/websites/{websiteId}": [
+    "Tracking code",
+    "Replays & Heatmaps",
+    "Share"
+  ],
+  "/boards/{boardId}/edit": [
+    "Board",
+    "Share"
+  ],
+  "/dashboard/edit": [
+    "Dashboard",
+    "Row 1",
+    "Empty column"
+  ],
+  "/websites/{websiteId}": [
+    "Visitors",
+    "Visits",
+    "Views",
+    "Bounce rate",
+    "Visit duration",
+    "Traffic over time",
+    "Pages",
+    "Path"
+  ],
+  "/websites/{websiteId}/compare": [
+    "Visitors",
+    "Visits",
+    "Views",
+    "Bounce rate",
+    "Visit duration",
+    "Traffic over time",
+    "Previous",
+    "Previous: Path"
+  ],
+  "/websites/{websiteId}/events": [
+    "Visitors",
+    "Visits",
+    "Unique events",
+    "Events over time",
+    "Event"
+  ],
+  "/websites/{websiteId}/performance": [
+    "Largest Contentful Paint (ms)",
+    "Pages",
+    "Environment"
+  ],
+  "/websites/{websiteId}/realtime": [
+    "Views",
+    "Visitors",
+    "Events",
+    "Countries",
+    "Traffic over time",
+    "Activity",
+    "Pages",
+    "Referrers"
+  ],
+  "/websites/{websiteId}/revenue": [
+    "Total",
+    "AOV",
+    "ARPU",
+    "Orders",
+    "Unique Customers",
+    "Sources",
+    "Location",
+    "Customers"
+  ],
+  "/websites/{websiteId}/settings": [
+    "Website",
+    "Tracking code",
+    "Replays & Heatmaps",
+    "Share"
+  ]
+}

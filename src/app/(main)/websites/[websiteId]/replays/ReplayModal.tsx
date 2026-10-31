@@ -3,7 +3,7 @@ import { Column, Dialog, Modal, type ModalProps } from '@umami/react-zen';
 import { useEffect, useState } from 'react';
 import { ReplayPlayback } from '@/app/(main)/websites/[websiteId]/replays/[replayId]/ReplayPlayback';
 import { ControlledDialog } from '@/components/common/ControlledDialog';
-import { useNavigation } from '@/components/hooks';
+import { useMessages, useNavigation } from '@/components/hooks';
 import { buildPath } from '@/lib/url';
 import styles from './ReplayModal.module.css';
 
@@ -19,6 +19,7 @@ export function ReplayModal({ websiteId, replayId, className, ...props }: Replay
     searchParams,
     updateParams,
   } = useNavigation();
+  const { t, labels } = useMessages();
   const activeReplayId = replayId || replay;
   const [replayOrientation, setReplayOrientation] = useState<'portrait' | 'landscape' | null>(null);
 
@@ -58,7 +59,7 @@ export function ReplayModal({ websiteId, replayId, className, ...props }: Replay
         onOpenChange={handleOpenChange}
       >
         <Column height="100%">
-          <Dialog className="h-full rounded-lg">
+          <Dialog className="h-full rounded-lg" aria-label={t(labels.replay)}>
             {({ close }) => (
               <Column padding="6">
                 {activeReplayId && (

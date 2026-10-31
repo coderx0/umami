@@ -32,8 +32,9 @@ export function WebsiteTrackingCode({
 
   const code = `<script defer src="${url}" data-website-id="${websiteId}"></script>`;
 
+  // a group named by the field, so its "Copy" says what it copies (guidelines 1.3)
   return (
-    <Column gap>
+    <Column gap role="group" aria-label={t(labels.trackingCode)}>
       {showHeader && <Label>{t(labels.trackingCode)}</Label>}
       <Text color="muted">{t(messages.trackingCode)}</Text>
       <TextField

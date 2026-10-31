@@ -17,12 +17,28 @@ export function ReplaysTable({ ...props }: DataTableProps) {
   const { t, labels } = useMessages();
   const { formatValue } = useFormat();
   const { router, updateParams } = useNavigation();
+  // a replay by its visitor's place, browser and OS (the sessions table names a session by place);
+  // its Play icon opens the player, paused, so it's named for that, not "Play".
+  const placeOf = (row: any) =>
+    [
+      row.city,
+      row.country && formatValue(row.country, 'country'),
+      formatValue(row.browser, 'browser'),
+      formatValue(row.os, 'os'),
+    ]
+      .filter(Boolean)
+      .join(', ');
 
   return (
-    <DataTable {...props}>
+    <DataTable aria-label={t(labels.replays)} {...props}>
       <DataColumn id="play" label="" width="80px">
         {(row: any) => (
-          <Button variant="quiet" onClick={() => router.push(updateParams({ replay: row.id }))}>
+          <Button
+            variant="quiet"
+            onClick={() => router.push(updateParams({ replay: row.id }))}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.replay)} ${placeOf(row)}`}
+            data-agentom-id={`replay.${row.id}.play`}
+          >
             <Icon>
               <Play />
             </Icon>
@@ -33,7 +49,8 @@ export function ReplaysTable({ ...props }: DataTableProps) {
         {(row: any) => (
           <Link
             href={updateParams({ session: row.sessionId })}
-            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)}`}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.session)} ${placeOf(row)}`}
+            data-agentom-id={`replay.${row.id}.session`}
           >
             <Avatar seed={row.sessionId} size={32} />
           </Link>

@@ -2,7 +2,7 @@
 import { Column } from '@umami/react-zen';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Empty } from '@/components/common/Empty';
-import { useMobile } from '@/components/hooks';
+import { useMessages, useMobile } from '@/components/hooks';
 import { getReplayPlayerEvents, getReplayViewport } from '@/lib/replay';
 import 'rrweb-player/dist/style.css';
 
@@ -23,7 +23,58 @@ function destroyReplayPlayer(player: { $destroy?: () => void } | null) {
   }
 }
 
+type ControlNames = {
+  play: string;
+  pause: string;
+  speed: string;
+  skipInactive: string;
+  fullscreen: string;
+};
+
+/**
+ * rrweb-player's controls have no names (icon buttons, a checkbox whose label
+ * is empty) and mark the current speed only by a class. Name them once it has
+ * rendered, and keep the play button's name and each speed's pressed state
+ * current (guidelines 1.3). Returns the cleanup.
+ */
+function nameControls(root: HTMLElement, player: any, names: ControlNames) {
+  const bar = root.querySelector('.rr-controller__btns');
+  if (!bar) return () => {};
+  const buttons = Array.from(bar.querySelectorAll<HTMLButtonElement>(':scope > button'));
+  const [play] = buttons;
+  const fullscreen = buttons.length > 1 ? buttons[buttons.length - 1] : undefined;
+  const speeds = buttons.slice(1, -1);
+
+  play?.setAttribute('aria-label', names.play);
+  player.addEventListener?.('ui-update-player-state', ({ payload }: { payload?: string }) =>
+    play?.setAttribute('aria-label', payload === 'playing' ? names.pause : names.play),
+  );
+  fullscreen?.setAttribute('aria-label', names.fullscreen);
+  bar.querySelector('input[type="checkbox"]')?.setAttribute('aria-label', names.skipInactive);
+  for (const speed of speeds) {
+    speed.setAttribute('aria-label', `${names.speed} ${speed.textContent?.trim()}`);
+  }
+  const markSpeed = () => {
+    for (const speed of speeds) {
+      speed.setAttribute('aria-pressed', String(speed.classList.contains('active')));
+    }
+  };
+  markSpeed();
+  const observer = new MutationObserver(markSpeed);
+  observer.observe(bar, { subtree: true, attributeFilter: ['class'] });
+  return () => observer.disconnect();
+}
+
 export function ReplayPlayer({ events }: { events: any[] }) {
+  const { t, labels } = useMessages();
+  const names = useRef<ControlNames>(null);
+  names.current = {
+    play: t(labels.play),
+    pause: t(labels.pause),
+    speed: t(labels.playbackSpeed),
+    skipInactive: t(labels.skipInactive),
+    fullscreen: t(labels.fullscreen),
+  };
   const playerWrapperRef = useRef<HTMLDivElement>(null);
   const playerRootRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
@@ -89,6 +140,7 @@ export function ReplayPlayer({ events }: { events: any[] }) {
 
   useEffect(() => {
     let cancelled = false;
+    let unname = () => {};
     const playerRoot = playerRootRef.current;
 
     setPlayerError(false);
@@ -131,6 +183,7 @@ export function ReplayPlayer({ events }: { events: any[] }) {
           }
 
           playerRef.current = player;
+          unname = nameControls(playerRoot, player, names.current);
         } catch {
           playerRoot.replaceChildren();
 
@@ -147,6 +200,7 @@ export function ReplayPlayer({ events }: { events: any[] }) {
 
     return () => {
       cancelled = true;
+      unname();
 
       if (playerRef.current) {
         destroyReplayPlayer(playerRef.current);

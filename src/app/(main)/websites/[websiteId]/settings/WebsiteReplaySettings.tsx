@@ -11,7 +11,7 @@ import {
   Text,
   TextField,
 } from '@umami/react-zen';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { EmptyPlaceholder } from '@/components/common/EmptyPlaceholder';
 import { useMessages, useSubscription, useUpdateQuery, useWebsite } from '@/components/hooks';
 import { Video } from '@/components/icons';
@@ -24,6 +24,9 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
   const { t, labels, messages } = useMessages();
   const { hasFeature, cloudMode, isLoading } = useSubscription(website?.teamId);
   const { mutateAsync, touch, toast, isPending } = useUpdateQuery(`/websites/${websiteId}`);
+  const maskLevelHintId = useId();
+  const maxDurationHintId = useId();
+  const blockSelectorHintId = useId();
   const config = getRecorderConfig(website?.replayConfig);
 
   const [replayEnabled, setReplayEnabled] = useState(config.replayEnabled === true);
@@ -136,8 +139,11 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
     );
   }
 
+  // The section is a group by its label, so its Save says which Save it is; the
+  // recorder code a group too, so its Copy says what it copies (guidelines 1.3).
+  // The sample rates read as percentages, as they mean, not 0.05 to 1.
   return (
-    <Column gap="4">
+    <Column gap="4" role="group" aria-label={sectionLabel}>
       <Label>{sectionLabel}</Label>
       <Switch isSelected={replayEnabled} onChange={handleReplayToggle} isDisabled={isPending}>
         {t(labels.replays)}
@@ -147,16 +153,19 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
       </Switch>
       {(replayEnabled || heatmapEnabled) && (
         <>
-          <Label>{t(labels.recorderCode)}</Label>
-          <Text color="muted">{t(messages.trackingCode)}</Text>
-          <TextField
-            value={recorderCode}
-            isReadOnly
-            allowCopy
-            asTextArea
-            resize="none"
-            className="code-textarea"
-          />
+          <Column gap role="group" aria-label={t(labels.recorderCode)}>
+            <Label>{t(labels.recorderCode)}</Label>
+            <Text color="muted">{t(messages.trackingCode)}</Text>
+            <TextField
+              value={recorderCode}
+              isReadOnly
+              allowCopy
+              asTextArea
+              aria-label={t(labels.recorderCode)}
+              resize="none"
+              className="code-textarea"
+            />
+          </Column>
           {heatmapEnabled && (
             <Slider
               label={`Heatmap ${t(labels.sampleRate).toLowerCase()}`}
@@ -166,6 +175,7 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
               value={heatmapSampleRate}
               onChange={v => setHeatmapSampleRate(Array.isArray(v) ? v[0] : v)}
               showValue
+              format={{ style: 'percent' }}
               style={{ maxWidth: '360px' }}
             />
           )}
@@ -179,14 +189,22 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
                 value={sampleRate}
                 onChange={v => setSampleRate(Array.isArray(v) ? v[0] : v)}
                 showValue
+                format={{ style: 'percent' }}
                 style={{ maxWidth: '360px' }}
               />
               <Column gap="1">
                 <Label>{t(labels.maskLevel)}</Label>
+                <span id={maskLevelHintId} hidden>
+                  {t(messages.maskLevelHint)}
+                </span>
                 <Select
                   value={maskLevel}
                   onChange={v => setMaskLevel(v as typeof maskLevel)}
-                  buttonProps={{ style: { maxWidth: '360px' } }}
+                  buttonProps={{
+                    style: { maxWidth: '360px' },
+                    'aria-label': t(labels.maskLevel),
+                    'aria-describedby': maskLevelHintId,
+                  }}
                 >
                   <ListItem id="strict">strict</ListItem>
                   <ListItem id="moderate">moderate</ListItem>
@@ -194,10 +212,17 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
               </Column>
               <Column gap="1">
                 <Label>{t(labels.maxDuration)}</Label>
+                <span id={maxDurationHintId} hidden>
+                  {t(messages.maxDurationHint)}
+                </span>
                 <Select
                   value={maxDuration}
                   onChange={v => setMaxDuration(v as string)}
-                  buttonProps={{ style: { maxWidth: '360px' } }}
+                  buttonProps={{
+                    style: { maxWidth: '360px' },
+                    'aria-label': t(labels.maxDuration),
+                    'aria-describedby': maxDurationHintId,
+                  }}
                 >
                   <ListItem id="300000">5 minutes</ListItem>
                   <ListItem id="600000">10 minutes</ListItem>
@@ -207,7 +232,15 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
               </Column>
               <Column gap="1">
                 <Label>{t(labels.blockSelector)}</Label>
-                <TextField value={blockSelector} onChange={setBlockSelector} />
+                <span id={blockSelectorHintId} hidden>
+                  {t(messages.blockSelectorHint)}
+                </span>
+                <TextField
+                  value={blockSelector}
+                  onChange={setBlockSelector}
+                  aria-label={t(labels.blockSelector)}
+                  aria-describedby={blockSelectorHintId}
+                />
               </Column>
             </>
           )}

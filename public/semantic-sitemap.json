@@ -27,7 +27,12 @@
       "children": [
         {
           "path": "{websiteId}",
-          "name": "Website"
+          "name": "Website",
+          "holds": [
+            "Tracking code",
+            "Replays & Heatmaps",
+            "Share"
+          ]
         }
       ]
     },
@@ -44,7 +49,11 @@
             },
             {
               "path": "edit",
-              "name": "Edit Board"
+              "name": "Edit Board",
+              "holds": [
+                "Board",
+                "Share"
+              ]
             }
           ]
         }
@@ -55,7 +64,12 @@
       "children": [
         {
           "path": "edit",
-          "name": "Edit Dashboard"
+          "name": "Edit Dashboard",
+          "holds": [
+            "Dashboard",
+            "Row 1",
+            "Empty column"
+          ]
         }
       ]
     },
@@ -167,6 +181,16 @@
               "tag"
             ]
           },
+          "holds": [
+            "Visitors",
+            "Visits",
+            "Views",
+            "Bounce rate",
+            "Visit duration",
+            "Traffic over time",
+            "Pages",
+            "Path"
+          ],
           "children": [
             {
               "path": "attribution"
@@ -202,10 +226,27 @@
                   "distinctId",
                   "tag"
                 ]
-              }
+              },
+              "holds": [
+                "Visitors",
+                "Visits",
+                "Views",
+                "Bounce rate",
+                "Visit duration",
+                "Traffic over time",
+                "Previous",
+                "Previous: Path"
+              ]
             },
             {
-              "path": "events"
+              "path": "events",
+              "holds": [
+                "Visitors",
+                "Visits",
+                "Unique events",
+                "Events over time",
+                "Event"
+              ]
             },
             {
               "path": "funnels"
@@ -220,10 +261,25 @@
               "path": "journeys"
             },
             {
-              "path": "performance"
+              "path": "performance",
+              "holds": [
+                "Largest Contentful Paint (ms)",
+                "Pages",
+                "Environment"
+              ]
             },
             {
-              "path": "realtime"
+              "path": "realtime",
+              "holds": [
+                "Views",
+                "Visitors",
+                "Events",
+                "Countries",
+                "Traffic over time",
+                "Activity",
+                "Pages",
+                "Referrers"
+              ]
             },
             {
               "path": "replays",
@@ -238,7 +294,17 @@
               "path": "retention"
             },
             {
-              "path": "revenue"
+              "path": "revenue",
+              "holds": [
+                "Total",
+                "AOV",
+                "ARPU",
+                "Orders",
+                "Unique Customers",
+                "Sources",
+                "Location",
+                "Customers"
+              ]
             },
             {
               "path": "segments"
@@ -253,7 +319,13 @@
               ]
             },
             {
-              "path": "settings"
+              "path": "settings",
+              "holds": [
+                "Website",
+                "Tracking code",
+                "Replays & Heatmaps",
+                "Share"
+              ]
             },
             {
               "path": "utm",

@@ -40,9 +40,9 @@ export function ReplaySaveForm({
   };
 
   return (
-    <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+    <Form onSubmit={handleSubmit} error={getErrorMessage(error)} aria-label={t(labels.saveReplay)}>
       <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-        <TextField autoFocus />
+        <TextField autoFocus aria-required />
       </FormField>
       <FormButtons>
         <Button isDisabled={isPending} onPress={onClose}>

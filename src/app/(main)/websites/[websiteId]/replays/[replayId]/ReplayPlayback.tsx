@@ -1,7 +1,7 @@
 'use client';
 import { Button, Column, Dialog, DialogTrigger, Icon, Popover, Row, Text } from '@umami/react-zen';
 import { Bookmark, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { SessionInfo } from '@/app/(main)/websites/[websiteId]/sessions/SessionInfo';
 import { Avatar } from '@/components/common/Avatar';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
@@ -36,7 +36,8 @@ export function ReplayPlayback({
   const { data: replay, isLoading, error } = useReplayQuery(websiteId, replayId);
   const { data: replaySaved } = useReplaySavedQuery(websiteId, replayId);
   const { data: session } = useWebsiteSessionQuery(websiteId, replay?.sessionId);
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const saveHintId = useId();
   const { isMobile } = useMobile();
   const [isSaved, setIsSaved] = useState<boolean | null>(null);
   const { mutate } = useUpdateQuery(`/websites/${websiteId}/replays/saved/${replayId}`);
@@ -87,15 +88,29 @@ export function ReplayPlayback({
                 </Column>
               </Row>
               <Row gap="2" style={{ flex: '0 0 auto' }}>
+                <span id={saveHintId} hidden>
+                  {t(messages.saveReplayHint)}
+                </span>
+                {/* icon buttons, named (guidelines 1.3) */}
                 {saved ? (
-                  <Button onPress={handleUnsave} variant="quiet">
+                  <Button
+                    onPress={handleUnsave}
+                    variant="quiet"
+                    aria-label={t(labels.unsaveReplay)}
+                    data-agentom-id="replay.unsave"
+                  >
                     <Icon>
                       <Bookmark fill="currentColor" />
                     </Icon>
                   </Button>
                 ) : (
                   <DialogTrigger>
-                    <Button variant="quiet">
+                    <Button
+                      variant="quiet"
+                      aria-label={t(labels.saveReplay)}
+                      aria-describedby={saveHintId}
+                      data-agentom-id="replay.save"
+                    >
                       <Icon>
                         <Bookmark fill="none" />
                       </Icon>
@@ -118,7 +133,7 @@ export function ReplayPlayback({
                   </DialogTrigger>
                 )}
                 {onClose && (
-                  <Button onPress={onClose} variant="quiet">
+                  <Button onPress={onClose} variant="quiet" aria-label={t(labels.close)}>
                     <Icon>
                       <X />
                     </Icon>

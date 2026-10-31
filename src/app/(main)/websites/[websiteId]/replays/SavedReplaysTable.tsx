@@ -7,13 +7,17 @@ export function SavedReplaysTable({ ...props }: DataTableProps) {
   const { t, labels } = useMessages();
   const { router, updateParams } = useNavigation();
 
+  // the table named, and each row's Play icon by the saved replay's name: it opens
+  // the player, paused (guidelines 1.3)
   return (
-    <DataTable {...props}>
+    <DataTable aria-label={t(labels.saved)} {...props}>
       <DataColumn id="play" label="" width="80px">
         {(row: any) => (
           <Button
             variant="quiet"
             onClick={() => router.push(updateParams({ replay: row.visitId }))}
+            aria-label={`${t(labels.viewDetails)}: ${t(labels.replay)} ${row.name}`}
+            data-agentom-id={`saved-replay.${row.id}.open`}
           >
             <Icon>
               <Play />

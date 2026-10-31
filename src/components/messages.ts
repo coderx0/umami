@@ -477,6 +477,11 @@ export const labels: Record<string, string> = {
   resetSetting: 'label.reset-setting',
   regenerateAccessCode: 'label.regenerate-access-code',
   regenerateSlug: 'label.regenerate-slug',
+  pause: 'label.pause',
+  fullscreen: 'label.fullscreen',
+  playbackSpeed: 'label.playback-speed',
+  skipInactive: 'label.skip-inactive',
+  unsaveReplay: 'label.unsave-replay',
   startDate: 'label.start-date',
   endDate: 'label.end-date',
 };
@@ -630,4 +635,8 @@ export const messages: Record<string, string> = {
   previousPeriodHint: 'message.previous-period-hint',
   nextPeriodHint: 'message.next-period-hint',
   filterEventHint: 'message.filter-event-hint',
+  blockSelectorHint: 'message.block-selector-hint',
+  maskLevelHint: 'message.mask-level-hint',
+  maxDurationHint: 'message.max-duration-hint',
+  saveReplayHint: 'message.save-replay-hint',
 };
