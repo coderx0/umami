@@ -477,6 +477,8 @@ export const labels: Record<string, string> = {
   resetSetting: 'label.reset-setting',
   regenerateAccessCode: 'label.regenerate-access-code',
   regenerateSlug: 'label.regenerate-slug',
+  startDate: 'label.start-date',
+  endDate: 'label.end-date',
 };
 
 export const messages: Record<string, string> = {
@@ -627,4 +629,5 @@ export const messages: Record<string, string> = {
   preferencesHint: 'message.preferences-hint',
   previousPeriodHint: 'message.previous-period-hint',
   nextPeriodHint: 'message.next-period-hint',
+  filterEventHint: 'message.filter-event-hint',
 };

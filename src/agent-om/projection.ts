@@ -20,11 +20,22 @@ declare global {
 export const appContext: {
   screen?: string;
   loading?: boolean;
+  /** a link was followed and its page isn't here yet: from where, and since when */
+  navigation?: { from: string; since: number };
   /** on a website's pages: which website (guidelines 5.5) */
   website?: { id: string; name?: string };
   /** on a website's pages: the dates its reports cover, resolved from the address's `date` */
   dateRange?: { start: string; end: string; unit: string };
 } = {};
+
+/** How long a followed link counts as loading, at most (a navigation that never happens). */
+export const NAVIGATION_TIMEOUT = 10_000;
+
+/** A followed link's page isn't here yet (guidelines 1.10, "Loading and settling"). */
+export function navigationPending() {
+  const nav = appContext.navigation;
+  return !!nav && Date.now() - nav.since < NAVIGATION_TIMEOUT;
+}
 
 /**
  * Screen name from the path and the route's params: a segment that is a
@@ -63,7 +74,7 @@ export function startProjection(): SemanticProjector {
   const projector = createSemanticProjector({
     context: (): SemanticAppContext => ({
       screen: appContext.screen,
-      state: appContext.loading ? 'loading' : 'ready',
+      state: appContext.loading || navigationPending() ? 'loading' : 'ready',
       ...(appContext.website ? { website: appContext.website } : {}),
       ...(appContext.dateRange ? { dateRange: appContext.dateRange } : {}),
     }),

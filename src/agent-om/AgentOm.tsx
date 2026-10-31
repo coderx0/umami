@@ -5,7 +5,7 @@ import { type ReactNode, useEffect } from 'react';
 import { useDateRange, useWebsiteQuery } from '@/components/hooks';
 import { ChatPanel } from './ChatPanel';
 import { checkPage } from './check';
-import { appContext, screenOf, startProjection } from './projection';
+import { appContext, NAVIGATION_TIMEOUT, screenOf, startProjection } from './projection';
 
 /**
  * Runs the app's projector and keeps its context current: the screen from the
@@ -28,10 +28,36 @@ export function AgentOm({ children }: { children: ReactNode }) {
     if (process.env.NODE_ENV !== 'production') window.__agentOmCheck = checkPage;
   }, []);
 
+  // Next follows a link in the background: until the address changes, the old
+  // page is still shown, so a followed link counts as loading (guidelines,
+  // "Loading and settling": a navigation pending). Cleared below when the
+  // address changes, or after NAVIGATION_TIMEOUT if it never does.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+      if (!link || (link.target && link.target !== '_self') || link.hasAttribute('download')) {
+        return;
+      }
+      const url = new URL(link.href, window.location.href);
+      const from = window.location.pathname + window.location.search;
+      if (url.origin !== window.location.origin || url.pathname + url.search === from) return;
+      appContext.navigation = { from, since: Date.now() };
+      window.__semanticUI?.refresh();
+      setTimeout(() => window.__semanticUI?.refresh(), NAVIGATION_TIMEOUT);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, []);
+
   // Navigation and loading don't always touch the DOM, so tell the projector.
   useEffect(() => {
     appContext.screen = screenOf(pathname, params as Record<string, string | string[]>);
     appContext.loading = fetching > 0;
+    const here = pathname + (search.size ? `?${search.toString()}` : '');
+    if (appContext.navigation && appContext.navigation.from !== here) {
+      appContext.navigation = undefined;
+    }
     appContext.website = websiteId
       ? { id: websiteId, ...(website?.name ? { name: website.name } : {}) }
       : undefined;

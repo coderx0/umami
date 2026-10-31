@@ -2,8 +2,8 @@ import { Button, Column, Row, Tab, TabList, TabPanel, Tabs } from '@umami/react-
 import { useState } from 'react';
 import { useFilters, useMessages, useMobile, useNavigation } from '@/components/hooks';
 import { FieldFilters } from '@/components/input/FieldFilters';
-import { PropertyFilters } from '@/components/property-data/PropertyFilters';
 import { SegmentFilters } from '@/components/input/SegmentFilters';
+import { PropertyFilters } from '@/components/property-data/PropertyFilters';
 import type { EventPropertyFilter, SessionPropertyFilter } from '@/lib/types';
 
 export interface FilterEditFormProps {
@@ -19,30 +19,19 @@ export interface FilterEditFormProps {
   onClose?: () => void;
 }
 
-export function FilterEditForm({ websiteId, onChange, onClose }: FilterEditFormProps) {
-  const {
-    query: { segment, cohort, match },
-    pathname,
-  } = useNavigation();
-  const { filters, eventPropertyFilters, sessionPropertyFilters } = useFilters();
-  const { t, labels } = useMessages();
-  const [currentFilters, setCurrentFilters] = useState(filters);
-  const [currentEventPropertyFilters, setCurrentEventPropertyFilters] = useState(eventPropertyFilters);
-  const [currentSessionPropertyFilters, setCurrentSessionPropertyFilters] =
-    useState(sessionPropertyFilters);
-  const [currentSegment, setCurrentSegment] = useState(segment);
-  const [currentCohort, setCurrentCohort] = useState(cohort);
-  const [currentMatch, setCurrentMatch] = useState<string>(match || 'all');
-  const { isMobile } = useMobile();
+/**
+ * The fields a page can't filter by, left out of the form. The filter button's
+ * description is built from the same list, so it offers what the form shows.
+ */
+export function excludedFilterFields(pathname: string, websiteId?: string): string[] {
   const isPixelLink = !websiteId || pathname.includes('/pixels') || pathname.includes('/links');
-  const isEventsPath = pathname.endsWith('/events');
   const excludeEvent =
     !pathname.endsWith('/events') &&
     !pathname.endsWith('/replays') &&
     !pathname.endsWith('/heatmaps');
   const isPerformance = pathname.includes('/performance');
 
-  const excludedFields = isPixelLink
+  return isPixelLink
     ? ['path', 'title', 'hostname', 'distinctId', 'tag', 'event']
     : isPerformance
       ? [
@@ -60,6 +49,27 @@ export function FilterEditForm({ websiteId, onChange, onClose }: FilterEditFormP
       : excludeEvent
         ? ['event']
         : [];
+}
+
+export function FilterEditForm({ websiteId, onChange, onClose }: FilterEditFormProps) {
+  const {
+    query: { segment, cohort, match },
+    pathname,
+  } = useNavigation();
+  const { filters, eventPropertyFilters, sessionPropertyFilters } = useFilters();
+  const { t, labels } = useMessages();
+  const [currentFilters, setCurrentFilters] = useState(filters);
+  const [currentEventPropertyFilters, setCurrentEventPropertyFilters] =
+    useState(eventPropertyFilters);
+  const [currentSessionPropertyFilters, setCurrentSessionPropertyFilters] =
+    useState(sessionPropertyFilters);
+  const [currentSegment, setCurrentSegment] = useState(segment);
+  const [currentCohort, setCurrentCohort] = useState(cohort);
+  const [currentMatch, setCurrentMatch] = useState<string>(match || 'all');
+  const { isMobile } = useMobile();
+  const isPixelLink = !websiteId || pathname.includes('/pixels') || pathname.includes('/links');
+  const isEventsPath = pathname.endsWith('/events');
+  const excludedFields = excludedFilterFields(pathname, websiteId);
 
   const handleReset = () => {
     setCurrentFilters([]);
@@ -97,7 +107,9 @@ export function FilterEditForm({ websiteId, onChange, onClose }: FilterEditFormP
         WebkitOverflowScrolling: 'touch',
       } as const)
     : undefined;
-  const mobileTabStyle = isMobile ? ({ flex: '0 0 auto', whiteSpace: 'nowrap' } as const) : undefined;
+  const mobileTabStyle = isMobile
+    ? ({ flex: '0 0 auto', whiteSpace: 'nowrap' } as const)
+    : undefined;
 
   return (
     <Column width={isMobile ? 'auto' : '800px'} gap="6" style={{ flex: 1, minHeight: 0 }}>

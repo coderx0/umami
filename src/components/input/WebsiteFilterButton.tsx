@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { useFields, useFilters, useMessages, useNavigation } from '@/components/hooks';
 import { ListFilter } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
-import { FilterEditForm } from '@/components/input/FilterEditForm';
+import { excludedFilterFields, FilterEditForm } from '@/components/input/FilterEditForm';
 import {
   filtersArrayToObject,
   serializeSessionPropertyFilters,
@@ -19,7 +19,7 @@ export function WebsiteFilterButton({
   position?: 'bottom' | 'top' | 'left' | 'right';
   alignment?: 'end' | 'center' | 'start';
 }) {
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
   const { updateParams, pathname, router, query } = useNavigation();
   const { filters: currentFilters } = useFilters();
   const isEventsPath = pathname.endsWith('/events');
@@ -71,13 +71,19 @@ export function WebsiteFilterButton({
   };
 
   // what the dialog offers, from the same fields and tabs it shows (named before it opens)
+  const excludedFields = excludedFilterFields(pathname, websiteId);
+  const shownFields = fields.filter(({ name }) => !excludedFields.includes(name));
   const choices = [
-    `${t(labels.fields)} (${fields.map(({ filterLabel }) => filterLabel).join(', ')})`,
+    `${t(labels.fields)} (${shownFields.map(({ filterLabel }) => filterLabel).join(', ')})`,
     t(labels.segments),
     t(labels.cohorts),
     ...(isEventsPath ? [t(labels.eventProperties)] : []),
     t(labels.sessionData),
     ...(isOverview || allowBounceFilter ? [t(labels.excludeBounce)] : []),
+    // where a website's page can't filter by event, which one can
+    ...(websiteId && excludedFields.length === 1 && excludedFields[0] === 'event'
+      ? [t(messages.filterEventHint)]
+      : []),
   ];
 
   return (

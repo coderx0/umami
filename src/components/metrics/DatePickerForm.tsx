@@ -47,19 +47,25 @@ export function DatePickerForm({
           <Calendar value={date} minValue={minDate} maxValue={maxDate} onChange={setDate} />
         )}
         {selected.includes(FILTER_RANGE) && (
+          // two calendars whose days and months read the same: each is a group named
+          // by the date it sets, so a click says which (guidelines 1.3)
           <Row gap wrap="wrap" style={{ margin: '0 auto' }}>
-            <Calendar
-              value={startDate}
-              minValue={minDate}
-              maxValue={endDate}
-              onChange={setStartDate}
-            />
-            <Calendar
-              value={endDate}
-              minValue={startDate}
-              maxValue={maxDate}
-              onChange={setEndDate}
-            />
+            <div role="group" aria-label={t(labels.startDate)}>
+              <Calendar
+                value={startDate}
+                minValue={minDate}
+                maxValue={endDate}
+                onChange={setStartDate}
+              />
+            </div>
+            <div role="group" aria-label={t(labels.endDate)}>
+              <Calendar
+                value={endDate}
+                minValue={startDate}
+                maxValue={maxDate}
+                onChange={setEndDate}
+              />
+            </div>
           </Row>
         )}
       </Column>

@@ -340,6 +340,26 @@ Not done: hints (`holds`, what each page holds), by the crawler in
   package ships its source.
 - Next's dev indicator sits bottom right, over the chat's column; the
   composer leaves room for it.
+- Manual task (2026-10-31): a goal, then last month's signup_completed
+  conversions by country, a segment, a board and a share, stopped at the
+  30-action limit. 13 actions went on the custom date range: its two
+  calendars (start and end) both show the same month, and their days read
+  the same, so "September 30th" set the start date again and the range came
+  out Sep 30 – Oct 31. The calendars are now groups named "Start date" and
+  "End date", and agent-om's view tells twins apart by the nearest container
+  where they differ (it named only the nearest, both "October 2026"). And
+  the Filter button listed Event among its fields on pages whose form leaves
+  it out (only Events, Replays and Heatmaps filter by event): its
+  description and the form now take the fields from one function, and say
+  that filtering by event is on the Events page.
+- Manual task B (2026-10-31, at 3x the limits): done in 48 actions, $0.025,
+  right, and it said the second page (/signup) made a funnel to itself. One
+  wasted click: it followed the Funnels link and read the page before Next
+  had shown it (the route was still compiling), and the page said `ready`.
+  A followed link now counts as loading until the address changes
+  (AgentOm.tsx; at most 10 s), as the guidelines' "Loading and settling"
+  asks: measured, `loading` for the 330 ms it took, then `ready` on the new
+  page.
 - A run that ends with a page dialog open (an expanded table on the
   overview) leaves the chat column covered by the dialog's backdrop: Run and
   Clear can't be pressed until the dialog closes (Escape). The chat's

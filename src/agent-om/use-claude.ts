@@ -7,7 +7,7 @@ import {
   StepFailed,
   siteOutline,
 } from '@agent-om/agent';
-import { HAIKU, projectionView, runClaude } from '@agent-om/agent/claude';
+import { CLAUDE_LIMITS, HAIKU, projectionView, runClaude } from '@agent-om/agent/claude';
 import type { SemanticProjector } from '@agent-om/core';
 import { useCallback, useRef, useState } from 'react';
 import { loadSitemap } from './load-sitemap';
@@ -179,6 +179,8 @@ export function useClaude() {
           record.request(r);
           void saveTranscript(record.transcript);
         },
+        // 3x the benchmark's limits, for long tasks tried by hand
+        limits: { actions: CLAUDE_LIMITS.actions * 3, modelCalls: CLAUDE_LIMITS.modelCalls * 3 },
         signal: controller.signal,
       });
     } catch (e) {
