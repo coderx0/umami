@@ -81,6 +81,7 @@ export function CohortEditForm({
       error={getErrorMessage(error)}
       onSubmit={handleSubmit}
       defaultValues={data || defaultValues}
+      aria-label={t(labels.cohort)}
     >
       {({ watch }) => {
         const type = watch('parameters.action.type');
@@ -88,7 +89,7 @@ export function CohortEditForm({
         return (
           <Column gap="4">
             <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-              <TextField autoFocus />
+              <TextField autoFocus aria-required />
             </FormField>
 
             <Column gap="1">
@@ -105,7 +106,9 @@ export function CohortEditForm({
                     rules={{ required: t(labels.required) }}
                   >
                     {({ field }) => {
-                      return <LookupField websiteId={websiteId} type={type} {...field} />;
+                      return (
+                        <LookupField websiteId={websiteId} type={type} aria-required {...field} />
+                      );
                     }}
                   </FormField>
                 </Column>

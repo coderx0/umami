@@ -237,7 +237,14 @@ they act on.
     languages listed; the choices a radio group, the one in use checked)
     and the preferences button are named and described
 
-Not yet done for the share pages: a task in the chat.
+A task in the chat on each share page, signed out (2026-10-31): 3 tasks, all
+answered right, 2 actions each, $0.0035 in all, checked against the pages
+and the database. The website share: the top three countries by visitors
+in the last 7 days (United States 1.24k, United Kingdom 324, India 279).
+The link share: 0 visitors in the last 90 days, no countries; it said the
+range ran to Sep 20, which was where the table's rows stopped in the
+projection (Notes, the row cap). The board share: the goal (43%, 6.79k of
+15.6k) and the metrics bar for the last 30 days, top to bottom.
 
 ### 5. Sitemap (done)
 
@@ -302,8 +309,16 @@ Not done: hints (`holds`, what each page holds), by the crawler in
   [img Chrome] Chrome" read as "Browser"). Reproduced on a bare page. Umami's
   icons were made decorative (`alt=""` beside their text, guidelines 1.6),
   which avoids it here.
-- **Finding for agent-om (the agent's view), not changed here:** a read-only
-  text field (`state.readonly`) is still offered as `type`.
+- **Finding for agent-om (the agent's view), fixed there:** a read-only
+  text field (`state.readonly`) was still offered as `type`. It isn't
+  offered now; its value is in the outline. Fixed on
+  `fix/aria-header-row-and-view` (test fails without it), re-packed here.
+- **Finding for agent-om (core's row cap and the agent's read), not changed
+  here:** a table holds at most 50 rows in the projection (`totalRows` has
+  the full count), and reading one says "(50 on the page)", though the page
+  has them all. On the link share's Last 90 days, the traffic table has 91
+  days (Aug 2 – Oct 31); Claude read the 50 and said the range ran to
+  Sep 20. Its answer (0 visitors) was right.
 - **Finding for agent-om (the agent's view), fixed there:** a toggle's
   option left out its description (`candidates.ts`: text fields and clicks
   added `describedOf`, toggles didn't), so Claude didn't see the journey
@@ -324,7 +339,8 @@ Not done: hints (`holds`, what each page holds), by the crawler in
   button logs a Base UI `nativeButton` error in the console, upstream.
 - react-zen's `FormField` rules don't expose `required`: required fields carry
   `aria-required` themselves (guidelines 1.4). The cohort and segment dialogs
-  (done before this) don't yet.
+  (done before this) now do too (their name, and the cohort's action value),
+  and their forms are named, as the goal's is.
 - The lookup hint said "separate up to 5 with commas", which reads as if a
   value could hold several. It's the suggestions' search that splits on commas
   (`getValues`); goals and funnels match their value exactly or with a `*` at

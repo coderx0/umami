@@ -76,10 +76,11 @@ export function SegmentEditForm({
       onSubmit={handleSubmit}
       defaultValues={data || { name: '', parameters: { filters, sessionPropertyFilters } }}
       error={getErrorMessage(error)}
+      aria-label={t(labels.segment)}
     >
       <Column gap="4">
         <FormField name="name" label={t(labels.name)} rules={{ required: t(labels.required) }}>
-          <TextField autoFocus={!segmentId} />
+          <TextField autoFocus={!segmentId} aria-required />
         </FormField>
         {showFilters && (
           <Column gap="4">
