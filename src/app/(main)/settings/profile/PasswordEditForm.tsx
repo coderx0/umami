@@ -56,7 +56,7 @@ export function PasswordEditForm({ onSave, onClose }) {
           validate: samePassword,
         }}
       >
-        <PasswordField autoComplete="confirm-password" />
+        <PasswordField autoComplete="new-password" />
       </FormField>
       <FormButtons>
         <Button onPress={onClose}>{t(labels.cancel)}</Button>

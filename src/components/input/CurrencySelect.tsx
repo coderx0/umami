@@ -18,7 +18,7 @@ export function CurrencySelect({ value, onChange }) {
       allowSearch
     >
       {CURRENCIES.map(({ id, name }) => {
-        if (search && !`${id}${name}`.toLowerCase().includes(search)) {
+        if (search && !`${id}${name}`.toLowerCase().includes(search.toLowerCase())) {
           return null;
         }
 

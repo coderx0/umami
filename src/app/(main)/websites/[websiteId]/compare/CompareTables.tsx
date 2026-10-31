@@ -148,6 +148,8 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
     router.push(renderPath(id));
   };
 
+  const viewLabel = items.find(({ id }) => id === view)?.label;
+
   return (
     <>
       <Row width="300px">
@@ -177,6 +179,8 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
               type={view}
               limit={20}
               showMore={false}
+              title={viewLabel}
+              metric={t(labels.visitors)}
               params={params}
               onDataLoad={setData}
             />
@@ -191,6 +195,8 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
               type={view}
               limit={20}
               showMore={false}
+              title={viewLabel}
+              metric={t(labels.visitors)}
               renderChange={renderChange}
             />
           </Column>

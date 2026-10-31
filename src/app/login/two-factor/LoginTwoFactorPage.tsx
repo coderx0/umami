@@ -140,7 +140,7 @@ export function LoginTwoFactorPage() {
         </Form>
 
         <Button variant="quiet" onPress={() => setUseBackup(v => !v)}>
-          {useBackup ? t(labels.twoFactorLogin) : t(labels.twoFactorUseBackup)}
+          {useBackup ? t(labels.twoFactorUseAppCode) : t(labels.twoFactorUseBackup)}
         </Button>
       </Column>
     </Column>

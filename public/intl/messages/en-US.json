@@ -354,6 +354,8 @@
     "transfer-website": "Transfer website",
     "true": "True",
     "ttfb": "TTFB",
+    "two-factor-backup-code": "Backup code",
+    "two-factor-use-app-code": "Use the code from your authenticator app instead",
     "type": "Type",
     "unique": "Unique",
     "unique-events": "Unique events",

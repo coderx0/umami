@@ -115,7 +115,7 @@ export function RealtimeLog({ data }: { data: any }) {
     if (__type === TYPE_SESSION) {
       return t.rich(messages.visitorLog, {
         country: countryNames[country] || t(labels.unknown),
-        browser: BROWSERS[browser],
+        browser: BROWSERS[browser] || formatValue(browser, 'browser'),
         os: OS_NAMES[os] || os,
         device: t(labels[device] || labels.unknown),
         b: chunks => <b>{chunks}</b>,
