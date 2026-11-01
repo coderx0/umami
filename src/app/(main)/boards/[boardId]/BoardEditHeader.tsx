@@ -26,10 +26,15 @@ export function BoardDesignHeader() {
   return (
     <PageHeader title={title}>
       <Row gap="3">
-        <Button variant="quiet" onPress={handleCancel}>
+        <Button variant="quiet" onPress={handleCancel} data-agentom-id="board.cancel">
           {t(labels.cancel)}
         </Button>
-        <LoadingButton variant="primary" onPress={handleSave} isLoading={isPending}>
+        <LoadingButton
+          variant="primary"
+          onPress={handleSave}
+          isLoading={isPending}
+          data-agentom-id="board.save"
+        >
           {t(labels.save)}
         </LoadingButton>
       </Row>
