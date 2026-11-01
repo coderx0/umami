@@ -129,7 +129,9 @@ export function BoardProvider({
       parameters,
     });
 
-    toast(t(messages.saved));
+    toast(
+      t(currentBoard.id ? messages.itemSaved : messages.itemCreated, { item: t(labels.board) }),
+    );
     touch('boards');
 
     if (currentBoard.id) {
@@ -139,7 +141,18 @@ export function BoardProvider({
     }
 
     return result;
-  }, [mutateAsync, toast, t, labels.untitled, messages.saved, touch, router, renderUrl]);
+  }, [
+    mutateAsync,
+    toast,
+    t,
+    labels.board,
+    labels.untitled,
+    messages.itemCreated,
+    messages.itemSaved,
+    touch,
+    router,
+    renderUrl,
+  ]);
 
   if (boardId && isFetching && isLoading) {
     return <Loading placement="absolute" />;

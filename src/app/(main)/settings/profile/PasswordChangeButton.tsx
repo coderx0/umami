@@ -10,7 +10,7 @@ export function PasswordChangeButton() {
   const hintId = useId();
 
   const handleSave = () => {
-    toast(t(messages.saved));
+    toast(t(messages.passwordChanged));
   };
 
   return (

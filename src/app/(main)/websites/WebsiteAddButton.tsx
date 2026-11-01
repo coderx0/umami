@@ -16,7 +16,7 @@ export function WebsiteAddButton({ teamId, onSave }: { teamId: string; onSave?: 
   const [createdWebsite, setCreatedWebsite] = useState<{ id: string } | null>(null);
 
   const handleSave = async (website: { id: string }) => {
-    toast(t(messages.saved));
+    toast(t(messages.itemCreated, { item: t(labels.website) }));
     touch('websites');
     onSave?.();
 

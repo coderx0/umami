@@ -58,7 +58,9 @@ export function CohortEditForm({
       },
       {
         onSuccess: async () => {
-          toast(t(messages.saved));
+          toast(
+            t(cohortId ? messages.itemSaved : messages.itemCreated, { item: t(labels.cohort) }),
+          );
           touch('cohorts');
           onSave?.();
           onClose?.();

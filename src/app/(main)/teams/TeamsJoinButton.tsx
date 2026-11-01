@@ -11,7 +11,7 @@ export function TeamsJoinButton() {
   const hintId = useId();
 
   const handleJoin = () => {
-    toast(t(messages.saved));
+    toast(t(messages.teamJoined));
     touch('teams');
   };
 

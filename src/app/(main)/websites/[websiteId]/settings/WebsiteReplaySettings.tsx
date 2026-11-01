@@ -70,7 +70,7 @@ export function WebsiteReplaySettings({ websiteId }: { websiteId: string }) {
         },
         {
           onSuccess: async () => {
-            toast(t(messages.saved));
+            toast(t(messages.replaySettingsSaved));
             touch('websites');
             touch(`website:${websiteId}`);
           },

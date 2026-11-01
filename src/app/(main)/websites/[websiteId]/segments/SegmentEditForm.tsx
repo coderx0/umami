@@ -58,7 +58,9 @@ export function SegmentEditForm({
       },
       {
         onSuccess: async () => {
-          toast(t(messages.saved));
+          toast(
+            t(segmentId ? messages.itemSaved : messages.itemCreated, { item: t(labels.segment) }),
+          );
           touch('segments');
           onSave?.();
           onClose?.();

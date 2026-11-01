@@ -11,7 +11,7 @@ export function UserAddButton({ onSave }: { onSave?: () => void }) {
   const hintId = useId();
 
   const handleSave = () => {
-    toast(t(messages.saved));
+    toast(t(messages.itemCreated, { item: t(labels.user) }));
     touch('users');
     onSave?.();
   };

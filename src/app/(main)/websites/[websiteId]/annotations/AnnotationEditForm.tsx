@@ -55,7 +55,9 @@ export function AnnotationEditForm({
       },
       {
         onSuccess: async () => {
-          toast(t(messages.saved));
+          toast(
+            t(annotation ? messages.itemSaved : messages.itemCreated, { item: t(labels.note) }),
+          );
           touch('annotations');
           onSave?.();
           onClose?.();

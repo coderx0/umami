@@ -11,7 +11,7 @@ export function WebsiteEditForm({ websiteId, onSave }: { websiteId: string; onSa
     const { shareId, ...updateData } = data;
     await mutateAsync(updateData, {
       onSuccess: async () => {
-        toast(t(messages.saved));
+        toast(t(messages.itemSaved, { item: t(labels.website) }));
         touch('websites');
         touch(`website:${website.id}`);
         onSave?.();

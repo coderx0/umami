@@ -35,7 +35,7 @@ export function TeamEditForm({
   const handleSubmit = async (data: any) => {
     await mutateAsync(data, {
       onSuccess: async () => {
-        toast(t(messages.saved));
+        toast(t(messages.itemSaved, { item: t(labels.team) }));
         touch('teams');
         touch(`teams:${teamId}`);
         onSave?.();

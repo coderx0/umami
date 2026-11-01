@@ -24,7 +24,7 @@ export function UserEditForm({ userId, onSave }: { userId: string; onSave?: () =
   const handleSubmit = async (data: any) => {
     await mutateAsync(data, {
       onSuccess: async () => {
-        toast(t(messages.saved));
+        toast(t(messages.itemSaved, { item: t(labels.user) }));
         touch('users');
         touch(`user:${user.id}`);
         onSave?.();

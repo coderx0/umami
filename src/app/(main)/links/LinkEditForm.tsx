@@ -51,7 +51,7 @@ export function LinkEditForm({
   const handleSubmit = async (data: any) => {
     await mutateAsync(data, {
       onSuccess: async () => {
-        toast(t(messages.saved));
+        toast(t(linkId ? messages.itemSaved : messages.itemCreated, { item: t(labels.link) }));
         touch('links');
         touch(`link:${linkId}`);
         onSave?.();

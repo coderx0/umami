@@ -67,7 +67,7 @@ export function BoardCloneForm({
       parameters: setBoardEntity(board?.parameters, boardType, data.entityId || undefined),
     });
 
-    toast(t(messages.saved));
+    toast(t(messages.itemCreated, { item: t(labels.board) }));
     touch('boards');
     touch(`board:${result.id}`);
     await onSave?.(result);

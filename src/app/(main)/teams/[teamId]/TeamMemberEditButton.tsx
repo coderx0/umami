@@ -26,7 +26,7 @@ export function TeamMemberEditButton({
 
   const handleSave = () => {
     touch('teams:members');
-    toast(t(messages.saved));
+    toast(t(messages.itemSaved, { item: t(labels.member) }));
     onSave?.();
   };
 

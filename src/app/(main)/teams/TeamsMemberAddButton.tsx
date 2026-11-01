@@ -18,7 +18,7 @@ export function TeamsMemberAddButton({
   const hintId = useId();
 
   const handleSave = async () => {
-    toast(t(messages.saved));
+    toast(t(messages.itemAdded, { item: t(labels.member) }));
     touch('teams:members');
     onSave?.();
   };

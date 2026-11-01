@@ -92,12 +92,12 @@ export function DashboardProvider({
       parameters,
     });
 
-    toast(t(messages.saved));
+    toast(t(messages.itemSaved, { item: t(labels.dashboard) }));
     touch('dashboard');
     touch('boards');
 
     return result;
-  }, [board, labels.dashboard, messages.saved, mutateAsync, t, toast, touch]);
+  }, [board, labels.dashboard, messages.itemSaved, mutateAsync, t, toast, touch]);
 
   if (isFetching && isLoading) {
     return <Loading placement="absolute" />;

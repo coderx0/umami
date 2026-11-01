@@ -78,7 +78,7 @@ export function BoardEditForm({
       parameters: setBoardEntity(board?.parameters, data.type, data.entityId || undefined),
     });
 
-    toast(t(messages.saved));
+    toast(t(boardId ? messages.itemSaved : messages.itemCreated, { item: t(labels.board) }));
     touch('boards');
     touch(`board:${result.id}`);
     await onSave?.(result);

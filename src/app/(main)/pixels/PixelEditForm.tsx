@@ -48,7 +48,7 @@ export function PixelEditForm({
   const handleSubmit = async (data: any) => {
     await mutateAsync(data, {
       onSuccess: async () => {
-        toast(t(messages.saved));
+        toast(t(pixelId ? messages.itemSaved : messages.itemCreated, { item: t(labels.pixel) }));
         touch('pixels');
         touch(`pixel:${pixelId}`);
         onSave?.();
