@@ -1,5 +1,5 @@
 import { Column, cn, Icon, Row, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { firstBy } from 'thenby';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useEscapeKey, useJourneyQuery, useMessages } from '@/components/hooks';
@@ -42,6 +42,13 @@ export function Journey({ websiteId, steps, startStep, endStep, view }: JourneyP
   });
 
   useEscapeKey(() => setSelectedNode(null));
+
+  // A selection holds the paths it was made from: new data (other steps, start,
+  // end, view or dates) clears it, or the counts would mix old paths with new.
+  useEffect(() => {
+    setSelectedNode(null);
+    setActiveNode(null);
+  }, [data]);
 
   const columns = useMemo(() => {
     if (!data) {
