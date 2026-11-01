@@ -1,8 +1,6 @@
 import { Column, Grid, Row, Text } from '@umami/react-zen';
-import { useSpring, useTransform } from 'motion/react';
-import { type ReactNode, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { List, type RowComponentProps } from 'react-window';
-import { AnimatedDiv } from '@/components/common/AnimatedDiv';
 import { Empty } from '@/components/common/Empty';
 import { useMessages, useMobile } from '@/components/hooks';
 import { formatLongNumber } from '@/lib/format';
@@ -38,7 +36,6 @@ export function ListTable({
   metric,
   renderLabel,
   renderChange,
-  animate = true,
   virtualize = false,
   showPercentage = true,
   itemCount = 10,
@@ -56,7 +53,6 @@ export function ListTable({
         label={renderLabel ? renderLabel(row, index) : (label ?? t(labels.unknown))}
         value={count}
         percent={percent}
-        animate={animate && !virtualize}
         showPercentage={showPercentage}
         rowIndex={virtualize ? index + 2 : undefined}
         change={renderChange ? renderChange(row, index) : null}
@@ -125,27 +121,15 @@ const AnimatedRow = ({
   value = 0,
   percent,
   change,
-  animate,
   showPercentage = true,
   formatCount,
   isPhone,
   rowIndex = undefined,
 }) => {
+  // the figures as they are, not counting up to them: a reader takes what's shown (guidelines 1.17)
   const y = !Number.isNaN(value) ? value : 0;
-  const ySpring = useSpring(0, { stiffness: 170, damping: 26 });
-  const widthSpring = useSpring(0, { stiffness: 170, damping: 26 });
-  const yText = useTransform(ySpring, n => (formatCount ? formatCount(n) : formatLongNumber(n)));
-  const widthText = useTransform(widthSpring, n => `${n?.toFixed?.(0)}%`);
-
-  useEffect(() => {
-    if (animate) {
-      ySpring.set(y);
-      widthSpring.set(percent);
-    } else {
-      ySpring.jump(y);
-      widthSpring.jump(percent);
-    }
-  }, [y, percent, animate, ySpring, widthSpring]);
+  const yText = formatCount ? formatCount(y) : formatLongNumber(y);
+  const widthText = `${percent?.toFixed?.(0)}%`;
 
   return (
     <Grid
@@ -171,7 +155,7 @@ const AnimatedRow = ({
       >
         {change}
         <Text weight="bold">
-          <AnimatedDiv title={String(value)}>{yText}</AnimatedDiv>
+          <div title={String(value)}>{yText}</div>
         </Text>
       </Row>
       {showPercentage && (
@@ -185,7 +169,7 @@ const AnimatedRow = ({
           paddingLeft="3"
           role="cell"
         >
-          <AnimatedDiv>{widthText}</AnimatedDiv>
+          <div>{widthText}</div>
         </Row>
       )}
     </Grid>

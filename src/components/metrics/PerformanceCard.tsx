@@ -1,7 +1,5 @@
 import { Column, Text } from '@umami/react-zen';
-import { useSpring, useTransform } from 'motion/react';
-import { useEffect, useId, useRef } from 'react';
-import { AnimatedDiv } from '@/components/common/AnimatedDiv';
+import { useId } from 'react';
 import { Badge } from '@/components/common/Badge';
 import { useMessages } from '@/components/hooks';
 import { WEB_VITALS_THRESHOLDS } from '@/lib/constants';
@@ -43,18 +41,9 @@ export const PerformanceCard = ({
   const valueId = useId();
   const ratingId = useId();
   const rating = getRating(metric, value);
-  const prevMetricRef = useRef(metric);
-  const metricChanged = prevMetricRef.current !== metric;
-  if (metricChanged) prevMetricRef.current = metric;
 
-  const target = !Number.isNaN(value) ? value : 0;
-  const spring = useSpring(target, { stiffness: 170, damping: 26 });
-  const display = useTransform(spring, n => formatValue(n));
-
-  useEffect(() => {
-    if (metricChanged) spring.jump(target);
-    else spring.set(target);
-  }, [target, metricChanged, spring]);
+  // the figure as it is, not counting up to it: a reader takes what's shown (guidelines 1.17)
+  const display = formatValue(!Number.isNaN(value) ? value : 0);
 
   // with onClick, a choice of metric: a radio named by it, described by its value and
   // rating (guidelines 1.4)
@@ -93,7 +82,7 @@ export const PerformanceCard = ({
         {label}
       </Text>
       <Text size="4xl" weight="bold" wrap="nowrap" id={valueId}>
-        <AnimatedDiv>{display}</AnimatedDiv>
+        <div>{display}</div>
       </Text>
       <Badge variant={RATING_VARIANTS[rating]} id={ratingId}>
         {t(labels[rating === 'needs-improvement' ? 'needsImprovement' : rating])}

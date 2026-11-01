@@ -1,7 +1,5 @@
 import { Button, Column, Icon, Row, Text, Tooltip, TooltipTrigger } from '@umami/react-zen';
-import { useSpring, useTransform } from 'motion/react';
-import { type ReactNode, useEffect, useId } from 'react';
-import { AnimatedDiv } from '@/components/common/AnimatedDiv';
+import { type ReactNode, useId } from 'react';
 import { useMessages } from '@/components/hooks';
 import { Info } from '@/components/icons';
 import { ChangeLabel } from '@/components/metrics/ChangeLabel';
@@ -33,18 +31,9 @@ export const MetricCard = ({
   const pct = diff !== 0 ? ((value - diff) / diff) * 100 : value !== 0 ? 100 : 0;
   const x = Number(value) || 0;
   const p = Number(pct) || 0;
-  const xSpring = useSpring(0, { stiffness: 170, damping: 26 });
-  const pctSpring = useSpring(0, { stiffness: 170, damping: 26 });
-  const valueText = useTransform(xSpring, n => formatValue(n));
-  const pctText = useTransform(pctSpring, n => `${Math.abs(~~n)}%`);
-
-  useEffect(() => {
-    xSpring.set(x);
-  }, [x, xSpring]);
-
-  useEffect(() => {
-    pctSpring.set(p);
-  }, [p, pctSpring]);
+  // the figures as they are, not counting up to them: a reader takes what's shown (guidelines 1.17)
+  const valueText = formatValue(x);
+  const pctText = `${Math.abs(~~p)}%`;
 
   const { t, labels } = useMessages();
   const tooltipId = useId();
@@ -92,11 +81,11 @@ export const MetricCard = ({
         </Row>
       )}
       <Text size="4xl" weight="bold" wrap="nowrap">
-        <AnimatedDiv title={value?.toString()}>{valueText}</AnimatedDiv>
+        <div title={value?.toString()}>{valueText}</div>
       </Text>
       {showChange && (
         <ChangeLabel value={change} title={formatValue(change)} reverseColors={reverseColors}>
-          <AnimatedDiv>{pctText}</AnimatedDiv>
+          <div>{pctText}</div>
         </ChangeLabel>
       )}
     </Column>

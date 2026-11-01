@@ -1,10 +1,19 @@
 import { Button, Calendar, Column, Row, ToggleGroup, ToggleGroupItem } from '@umami/react-zen';
-import { endOfDay, isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
+import { endOfDay, format, isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { useState } from 'react';
 import { useMessages } from '@/components/hooks';
 
 const FILTER_DAY = 'filter-day';
 const FILTER_RANGE = 'filter-range';
+
+/**
+ * A range calendar's day buttons named with the date they set: the two calendars show the
+ * same days, and "Saturday, October 31st, 2026" alone doesn't say which (guidelines 1.3).
+ * The day picker's own label, with the calendar's name after it.
+ */
+const dayLabel =
+  (calendar: string) => (date: Date, modifiers: { today?: boolean; selected?: boolean }) =>
+    `${modifiers.today ? 'Today, ' : ''}${format(date, 'PPPP')}, ${calendar}${modifiers.selected ? ', selected' : ''}`;
 
 export function DatePickerForm({
   startDate: defaultStartDate,
@@ -56,6 +65,7 @@ export function DatePickerForm({
                 minValue={minDate}
                 maxValue={endDate}
                 onChange={setStartDate}
+                labels={{ labelDayButton: dayLabel(t(labels.startDate)) }}
               />
             </div>
             <div role="group" aria-label={t(labels.endDate)}>
@@ -64,6 +74,7 @@ export function DatePickerForm({
                 minValue={startDate}
                 maxValue={maxDate}
                 onChange={setEndDate}
+                labels={{ labelDayButton: dayLabel(t(labels.endDate)) }}
               />
             </div>
           </Row>
