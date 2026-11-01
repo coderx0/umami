@@ -30,6 +30,8 @@ export function DatePickerForm({
   const [startDate, setStartDate] = useState(defaultStartDate || new Date());
   const [endDate, setEndDate] = useState(defaultEndDate || new Date());
   const { t, labels } = useMessages();
+  // clicking a calendar's selected day again clears it; the day stays selected
+  const keep = (set: (date: Date) => void) => (value?: Date) => value && set(value);
 
   const disabled = selected.includes(FILTER_DAY)
     ? isAfter(minDate, date) && isBefore(maxDate, date)
@@ -53,7 +55,7 @@ export function DatePickerForm({
       </Row>
       <Column>
         {selected.includes(FILTER_DAY) && (
-          <Calendar value={date} minValue={minDate} maxValue={maxDate} onChange={setDate} />
+          <Calendar value={date} minValue={minDate} maxValue={maxDate} onChange={keep(setDate)} />
         )}
         {selected.includes(FILTER_RANGE) && (
           // two calendars whose days and months read the same: each is a group named
@@ -64,7 +66,7 @@ export function DatePickerForm({
                 value={startDate}
                 minValue={minDate}
                 maxValue={endDate}
-                onChange={setStartDate}
+                onChange={keep(setStartDate)}
                 labels={{ labelDayButton: dayLabel(t(labels.startDate)) }}
               />
             </div>
@@ -73,7 +75,7 @@ export function DatePickerForm({
                 value={endDate}
                 minValue={startDate}
                 maxValue={maxDate}
-                onChange={setEndDate}
+                onChange={keep(setEndDate)}
                 labels={{ labelDayButton: dayLabel(t(labels.endDate)) }}
               />
             </div>
