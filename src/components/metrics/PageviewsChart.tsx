@@ -19,7 +19,7 @@ export interface PageviewsChartProps extends BarChartProps {
   unit: string;
 }
 
-export function PageviewsChart({ data, unit, minDate, maxDate, ...props }: PageviewsChartProps) {
+export function PageviewsChart({ data, unit, minDate, maxDate, legendActions, ...props }: PageviewsChartProps) {
   const { t, labels } = useMessages();
   const { theme } = useTheme();
   const { locale, dateLocale } = useLocale();
@@ -93,16 +93,22 @@ export function PageviewsChart({ data, unit, minDate, maxDate, ...props }: Pagev
         datasets={chartData?.datasets}
         unit={unit}
       />
-      <div data-agentom-ignore="" aria-hidden="true">
-        <BarChart
-          {...props}
-          chartData={chartData}
-          unit={unit}
-          minDate={minDate}
-          maxDate={maxDate}
-          renderXLabel={renderXLabel}
-          height="400px"
-        />
+      <div style={{ position: 'relative' }}>
+        <div data-agentom-ignore="" aria-hidden="true">
+          <BarChart
+            {...props}
+            // the actions' room in the legend row, so the legend sits where it does beside them
+            legendActions={legendActions ? <div style={{ height: 36 }} /> : undefined}
+            chartData={chartData}
+            unit={unit}
+            minDate={minDate}
+            maxDate={maxDate}
+            renderXLabel={renderXLabel}
+            height="400px"
+          />
+        </div>
+        {/* the legend's actions (the notes) are controls, not drawing: outside what's hidden, where the legend row shows them */}
+        {legendActions && <div style={{ position: 'absolute', right: 0, bottom: 0 }}>{legendActions}</div>}
       </div>
     </>
   );
