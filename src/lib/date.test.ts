@@ -226,6 +226,13 @@ describe('getOffsetDateRange', () => {
     expect(shifted.endDate).toEqual(addMonths(range.endDate, -1));
   });
 
+  test('ends the previous month on its last day when it is longer than this one', () => {
+    vi.setSystemTime(new Date('2026-11-01T12:00:00'));
+    const shifted = getOffsetDateRange(parseDateRange('0month'), -1);
+    expect(shifted.startDate).toEqual(startOfMonth(new Date('2026-10-15T12:00:00')));
+    expect(shifted.endDate).toEqual(endOfMonth(new Date('2026-10-15T12:00:00')));
+  });
+
   test('shifts year ranges (year rollover)', () => {
     const range = parseDateRange('1year');
     const shifted = getOffsetDateRange(range, 1);

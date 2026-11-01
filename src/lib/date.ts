@@ -254,7 +254,7 @@ export function getOffsetDateRange(dateRange: DateRange, offset: number) {
         ...dateRange,
         offset,
         startDate: addMonths(startDate, change),
-        endDate: addMonths(endDate, change),
+        endDate: endOfMonth(addMonths(endDate, change)),
       };
     case 'year':
       return {
