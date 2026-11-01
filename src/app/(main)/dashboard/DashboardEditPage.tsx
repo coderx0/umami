@@ -27,7 +27,7 @@ export function DashboardEditPage() {
         <Column>
           <DashboardEditHeader />
           <BoardControls />
-          <BoardEditBody requiresBoardWebsite={false} />
+          <BoardEditBody requiresBoardWebsite={false} kind="dashboard" />
         </Column>
       </PageBody>
     </DashboardProvider>

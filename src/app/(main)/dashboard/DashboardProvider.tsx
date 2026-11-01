@@ -54,6 +54,7 @@ export function DashboardProvider({
   const { t, labels, messages } = useMessages();
   const [board, setBoard] = useState<Partial<Board>>(data ?? createDefaultBoard());
   const layoutGetterRef = useRef<LayoutGetter | null>(null);
+  const [unsaved, setUnsaved] = useState(false);
 
   const registerLayoutGetter = useCallback((getter: LayoutGetter) => {
     layoutGetterRef.current = getter;
@@ -65,6 +66,7 @@ export function DashboardProvider({
         ...data,
         parameters: sanitizeBoardParameters(data.parameters),
       });
+      setUnsaved(false);
     }
   }, [data]);
 
@@ -76,6 +78,7 @@ export function DashboardProvider({
 
   const updateBoard = useCallback((data: Partial<Board>) => {
     setBoard(current => ({ ...current, ...data }));
+    setUnsaved(true);
   }, []);
 
   const saveBoard = useCallback(async () => {
@@ -95,6 +98,7 @@ export function DashboardProvider({
     toast(t(messages.itemSaved, { item: t(labels.dashboard) }));
     touch('dashboard');
     touch('boards');
+    setUnsaved(false);
 
     return result;
   }, [board, labels.dashboard, messages.itemSaved, mutateAsync, t, toast, touch]);
@@ -105,7 +109,7 @@ export function DashboardProvider({
 
   return (
     <BoardContext.Provider
-      value={{ board, editing, updateBoard, saveBoard, isPending, registerLayoutGetter }}
+      value={{ board, editing, updateBoard, saveBoard, isPending, unsaved, registerLayoutGetter }}
     >
       {children}
     </BoardContext.Provider>

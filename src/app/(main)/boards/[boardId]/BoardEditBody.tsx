@@ -1,16 +1,24 @@
 import { Box, Button, Icon, Row, Tooltip, TooltipTrigger } from '@umami/react-zen';
 import { produce } from 'immer';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useId, useRef } from 'react';
 import { Group, type GroupImperativeHandle, Panel, Separator } from 'react-resizable-panels';
 import { v4 as uuid } from 'uuid';
-import { useBoard } from '@/components/hooks';
+import { useBoard, useMessages } from '@/components/hooks';
 import { GripHorizontal, Plus } from '@/components/icons';
 import { getBoardEntity, getBoardType, requiresBoardEntity } from '@/lib/boards';
 import { BoardEditRow } from './BoardEditRow';
 import { BUTTON_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_ROW_HEIGHT } from './boardConstants';
 
-export function BoardEditBody({ requiresBoardWebsite = true }: { requiresBoardWebsite?: boolean }) {
-  const { board, updateBoard, registerLayoutGetter } = useBoard();
+export function BoardEditBody({
+  requiresBoardWebsite = true,
+  kind = 'board',
+}: {
+  requiresBoardWebsite?: boolean;
+  kind?: 'board' | 'dashboard';
+}) {
+  const { board, updateBoard, registerLayoutGetter, unsaved } = useBoard();
+  const { t, labels, messages } = useMessages();
+  const statusId = useId();
   const rowGroupRef = useRef<GroupImperativeHandle>(null);
   const columnGroupRefs = useRef<Map<string, GroupImperativeHandle>>(new Map());
 
@@ -109,8 +117,26 @@ export function BoardEditBody({ requiresBoardWebsite = true }: { requiresBoardWe
   const rows = board?.parameters?.rows ?? [];
   const minHeight = (rows.length || 1) * MAX_ROW_HEIGHT + BUTTON_ROW_HEIGHT;
 
+  const dashboard = kind === 'dashboard';
+
   return (
-    <Box>
+    <Box
+      role="region"
+      aria-label={t(dashboard ? labels.dashboardLayout : labels.boardLayout)}
+      aria-describedby={statusId}
+    >
+      {/* whether the layout's changes are saved yet (guidelines 1.19) */}
+      <span id={statusId} hidden>
+        {t(
+          dashboard
+            ? unsaved
+              ? messages.dashboardLayoutUnsaved
+              : messages.dashboardLayoutSaved
+            : unsaved
+              ? messages.boardLayoutUnsaved
+              : messages.boardLayoutSaved,
+        )}
+      </span>
       <Group style={{ minHeight: `${minHeight}px` }} groupRef={rowGroupRef} orientation="vertical">
         {rows.map((row, index) => (
           <Fragment key={`${row.id}:${row.size ?? 'auto'}`}>

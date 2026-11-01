@@ -1,10 +1,12 @@
 import { Button, LoadingButton, Row } from '@umami/react-zen';
+import { useId } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useBoard, useMessages, useNavigation } from '@/components/hooks';
 
 export function BoardDesignHeader() {
   const { board, saveBoard, isPending } = useBoard();
-  const { t, labels } = useMessages();
+  const { t, labels, messages } = useMessages();
+  const saveHintId = useId();
   const { router, renderUrl } = useNavigation();
   const title = board?.name || t(labels.untitled);
 
@@ -25,6 +27,10 @@ export function BoardDesignHeader() {
 
   return (
     <PageHeader title={title}>
+      {/* what Save keeps (guidelines 1.19) */}
+      <span id={saveHintId} hidden>
+        {t(messages.boardSaveHint)}
+      </span>
       <Row gap="3">
         <Button variant="quiet" onPress={handleCancel} data-agentom-id="board.cancel">
           {t(labels.cancel)}
@@ -33,6 +39,7 @@ export function BoardDesignHeader() {
           variant="primary"
           onPress={handleSave}
           isLoading={isPending}
+          aria-describedby={saveHintId}
           data-agentom-id="board.save"
         >
           {t(labels.save)}

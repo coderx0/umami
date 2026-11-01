@@ -16,6 +16,8 @@ export interface BoardContextValue {
   updateBoard: (data: Partial<Board>) => void;
   saveBoard: () => Promise<Board>;
   isPending: boolean;
+  /** Whether the layout has changes that aren't saved yet (a new board has nothing saved). */
+  unsaved: boolean;
   registerLayoutGetter: (getter: LayoutGetter) => void;
 }
 
@@ -72,6 +74,7 @@ export function BoardProvider({
   const [board, setBoard] = useState<Partial<Board>>(data ?? createDefaultBoard());
   const boardRef = useRef<Partial<Board>>(data ?? createDefaultBoard());
   const layoutGetterRef = useRef<LayoutGetter | null>(null);
+  const [unsaved, setUnsaved] = useState(!boardId);
 
   const registerLayoutGetter = useCallback((getter: LayoutGetter) => {
     layoutGetterRef.current = getter;
@@ -87,6 +90,7 @@ export function BoardProvider({
 
       boardRef.current = nextBoard;
       setBoard(nextBoard);
+      setUnsaved(false);
     }
   }, [data]);
 
@@ -111,6 +115,7 @@ export function BoardProvider({
 
       return nextBoard;
     });
+    setUnsaved(true);
   }, []);
 
   const saveBoard = useCallback(async () => {
@@ -133,6 +138,7 @@ export function BoardProvider({
       t(currentBoard.id ? messages.itemSaved : messages.itemCreated, { item: t(labels.board) }),
     );
     touch('boards');
+    setUnsaved(false);
 
     if (currentBoard.id) {
       touch(`board:${currentBoard.id}`);
@@ -160,7 +166,7 @@ export function BoardProvider({
 
   return (
     <BoardContext.Provider
-      value={{ board, editing, updateBoard, saveBoard, isPending, registerLayoutGetter }}
+      value={{ board, editing, updateBoard, saveBoard, isPending, unsaved, registerLayoutGetter }}
     >
       {children}
     </BoardContext.Provider>
